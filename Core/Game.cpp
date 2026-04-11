@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "../Config/GameConfig.h"
+#include "GameObject.h"
 
 Game::Game()
 {
@@ -168,7 +169,8 @@ void Game::go() const
 
 	do
 	{
-		printMessage("Ready...");
+		string status_message = "Level: 1, Timer: 4:00, Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
+		printMessage(status_message);
 		string budget_string = "BUDGET = $" + to_string(budget);
 		printBudget(budget_string);
 		//printBudget("BUDGET = $1000");
