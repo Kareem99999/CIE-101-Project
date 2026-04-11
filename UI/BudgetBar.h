@@ -16,11 +16,14 @@ class BudgetbarIcon :public Drawable
 {
 private:
 	//string image_path;
+	int static AnimalsCounter;
 public:
 	string image_path;
 	BudgetbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void draw() const override;
 	virtual void onClick() = 0;   //The action that should be taken when this icon is clicked
+	int static  getAnimalCounter();
+	void static  increaseAnimals();
 };
 
 class ChickIcon : public BudgetbarIcon
