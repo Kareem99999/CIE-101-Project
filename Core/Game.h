@@ -2,7 +2,7 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
-#include "GameObject.h"
+#include "../Core/GameObject.h"
 
 class Game
 {
@@ -14,7 +14,7 @@ private:
 	Warehouse* gameWarehouse;
 
 public:
-	int budget = 2000;
+	int budget = 20000;
 	Game();
 	~Game();
 

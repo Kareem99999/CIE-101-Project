@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-
+int BudgetbarIcon::AnimalsCounter = 0;
 BudgetbarIcon::BudgetbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
 	image_path = img_path;
@@ -15,6 +15,16 @@ void BudgetbarIcon::draw() const
 	//draw image of this object
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+}
+
+int BudgetbarIcon::getAnimalCounter()
+{
+	return AnimalsCounter;
+}
+
+void BudgetbarIcon::increaseAnimals()
+{
+	AnimalsCounter++;
 }
 
 ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
@@ -42,11 +52,11 @@ void ChickIcon::onClick()
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	*/
-	
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
 	cout << "Icon Chick Clicked" << endl;
 	if (pGame->budget > 100) {
 		pGame->budget = pGame->budget - 100;
+		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
 		pGame->printBudget(budget_string);
@@ -83,8 +93,9 @@ void ChickIcon::onClick()
 void CowIcon::onClick()
 {
 	cout << "Icon Cow Clicked" << endl;
-	if (pGame->budget > 200) {
-		pGame->budget = pGame->budget - 200;
+	if (pGame->budget > 1000) {
+		pGame->budget = pGame->budget - 1000;
+		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
 		pGame->printBudget(budget_string);
@@ -98,7 +109,7 @@ void CowIcon::onClick()
 		std::mt19937 gen2(rd2());
 		std::uniform_int_distribution<int> dist2(range_min_y, range_max_y);
 		p.y = dist2(gen2);
-		cowList[count] = new Cow(pGame, p, 50, 50, image_path);
+		cowList[count] = new Cow(pGame, p, 80, 50, image_path);
 		cowList[count]->draw();
 		count++;
 	}
