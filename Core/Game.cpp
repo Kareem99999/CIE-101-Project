@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "../Config/GameConfig.h"
 #include "GameObject.h"
+#include "../UI/BudgetBar.h"
+#include <thread>
+#include <chrono>
 
 Game::Game()
 {
@@ -13,8 +16,8 @@ Game::Game()
 	createToolbar();
 	createBudgetbar();
 	//3 - create and draw the backgroundPlayingArea
-	createFarm();
 	createWarehouse();
+	createFarm();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -34,7 +37,7 @@ Game::~Game()
 
 clicktype Game::getMouseClick(int& x, int& y) const
 {
-	return pWind->WaitMouseClick(x, y);	//Wait for mouse click
+	return pWind->GetMouseClick(x, y);	//Wait for mouse click
 
 }
 
@@ -88,14 +91,22 @@ void Game::createFarm()
 	point FarmRef;
 	FarmRef.x = config.windWidth / 4;
 	FarmRef.y = config.windHeight * 1 / 3;
-	int Height = config.windHeight * 2 / 3;
+	int Height = config.windHeight * 2 / 3.5;
 	int Width = config.windWidth / 2;
-
-	gameFarm = new Farm(this, FarmRef, Width, Height, GREEN, BROWN);
+	BudgetbarIcon::setRangeMinX(FarmRef.x + Farm::getMargin());
+	BudgetbarIcon::setRangeMaxX(FarmRef.x + Width - Farm::getMargin());
+	BudgetbarIcon::setRangeMinY(FarmRef.y + Farm::getMargin());
+	BudgetbarIcon::setRangeMaxY(FarmRef.y + Height - Farm::getMargin());
+	gameFarm = new Farm(this, FarmRef, Width, Height, GREEN, DARKGREEN);
 	gameFarm->draw();
 }
 
-void Game::createWarehouse() {
+void Game::redrawFarm() const
+{
+	gameFarm->draw();
+}
+
+void Game::createWarehouse(){
 	point WarehouseRef;
 	WarehouseRef.x = 0;
 	WarehouseRef.y = 100;
@@ -158,6 +169,11 @@ window* Game::getWind() const
 	return pWind;
 }
 
+Farm* Game::getFarm() const
+{
+	return gameFarm;
+}
+
 void Game::go() const
 {
 	//This function reads the position where the user clicks to determine the desired operation
@@ -173,8 +189,11 @@ void Game::go() const
 		printMessage(status_message);
 		string budget_string = "BUDGET = $" + to_string(budget);
 		printBudget(budget_string);
+		redrawFarm();
 		//printBudget("BUDGET = $1000");
 		getMouseClick(x, y);	//Get the coordinates of the user click
+		for (int i = 0; i < ChickIcon::count; i++){ ChickIcon::chickList[i]->moveStep(); }
+		for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
 		//{
 			//[1] If user clicks on the Toolbar
@@ -187,7 +206,7 @@ void Game::go() const
 			isExit = gameBudgetbar->handleClick(x, y);
 		}
 		//}
-
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	} while (!isExit);
 }
 

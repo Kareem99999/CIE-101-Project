@@ -1,10 +1,19 @@
 #include "Budgetbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include "../Entities/Animal.h"
 #include <iostream>
 using namespace std;
 
 int BudgetbarIcon::AnimalsCounter = 0;
+int ChickIcon::count = 0;
+int CowIcon::count = 0;
+Chick** ChickIcon::chickList = nullptr;
+Cow** CowIcon::cowList = nullptr;
+int BudgetbarIcon::range_min_x = 50;
+int BudgetbarIcon::range_max_x = config.windWidth - 50;
+int BudgetbarIcon::range_min_y = (config.toolBarHeight * 2) + 50;
+int BudgetbarIcon::range_max_y = config.windHeight - config.statusBarHeight - 50;
 BudgetbarIcon::BudgetbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
 	image_path = img_path;
@@ -25,6 +34,23 @@ int BudgetbarIcon::getAnimalCounter()
 void BudgetbarIcon::increaseAnimals()
 {
 	AnimalsCounter++;
+}
+
+void BudgetbarIcon::setRangeMinX(int valueMinX)
+{
+	range_min_x = valueMinX;
+}
+void BudgetbarIcon::setRangeMaxX(int valueMaxX)
+{
+	range_max_x = valueMaxX;
+}
+void BudgetbarIcon::setRangeMinY(int valueMinY)
+{
+	range_min_y = valueMinY;
+}
+void BudgetbarIcon::setRangeMaxY(int valueMaxY)
+{
+	range_max_y = valueMaxY;
 }
 
 ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
@@ -55,7 +81,7 @@ void ChickIcon::onClick()
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
 	cout << "Icon Chick Clicked" << endl;
 	if (pGame->budget > 100) {
-		pGame->budget = pGame->budget - 100;
+		pGame->budget -= 100;
 		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
@@ -68,7 +94,7 @@ void ChickIcon::onClick()
 		// 2. Seed the Mersenne Twister engine
 		// std::mt19937 is a high-quality pseudo-random number generator
 		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(range_min_x, range_max_x);
+		std::uniform_int_distribution<int> dist1(range_min_x, (range_max_x - Chick::getChickSizeInX()));
 		p.x = dist1(gen1);
 		//std::cout << "P.X = " << p.x << endl;
 		// 1. Obtain a seed from a non-deterministic source (if available)
@@ -77,12 +103,12 @@ void ChickIcon::onClick()
 		// 2. Seed the Mersenne Twister engine
 		// std::mt19937 is a high-quality pseudo-random number generator
 		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(range_min_y, range_max_y);
+		std::uniform_int_distribution<int> dist2(range_min_y, (range_max_y - Chick::getChickSizeInY()));
 		p.y = dist2(gen2);
 		//std::cout << "P.Y = " << p.y << endl;
 		//p.x = 300;
 		//p.y = 300;
-		chickList[count]= new Chick(pGame, p, 50, 50, image_path);
+		chickList[count]= new Chick(pGame, p, Chick::getChickSizeInX(), Chick::getChickSizeInY(), image_path);
 		chickList[count]->draw();
 		count++;
 		//window* pWind = pGame->getWind();
@@ -103,13 +129,13 @@ void CowIcon::onClick()
 		point p;
 		std::random_device rd1;
 		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(range_min_x, range_max_x);
+		std::uniform_int_distribution<int> dist1(range_min_x, (range_max_x - Cow::getCowSizeInX()));
 		p.x = dist1(gen1);
 		std::random_device rd2;
 		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(range_min_y, range_max_y);
+		std::uniform_int_distribution<int> dist2(range_min_y, (range_max_y - Cow::getCowSizeInY()));
 		p.y = dist2(gen2);
-		cowList[count] = new Cow(pGame, p, 80, 50, image_path);
+		cowList[count] = new Cow(pGame, p, Cow::getCowSizeInX(), Cow::getCowSizeInY(), image_path);
 		cowList[count]->draw();
 		count++;
 	}

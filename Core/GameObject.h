@@ -1,11 +1,11 @@
 #pragma once
 #include "Drawable.h"
-#include "Game.h"
+
 class GameObject : public Drawable
 {
 protected:
-	color fillColor;	//game object fill color
-	color borderColor;	//game object border color
+	static color fillColor;	//game object fill color
+	static color borderColor;	//game object border color
 
 public:
 	GameObject(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
@@ -26,12 +26,16 @@ public:
 
 class Farm : public GameObject {
 protected:
-	int FarmWidth = 0;
-	int FarmHeight = 0;
+	int static FarmWidth;
+	int static FarmHeight;
+	static int margin;
 public:
 	Farm(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
 	void draw() const override;
-	void SetFarmDim(int Width, int Height) { FarmWidth = Width, FarmHeight = Height; }
+	int static getFarmWidth();
+	int static getFarmHeight();
+	static int getMargin();
+	void keepInFarm(point& position, point& velocity, point dimensions, int maxVelo, int minVelo);
 };
 
 class Warehouse : public GameObject {

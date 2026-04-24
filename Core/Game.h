@@ -32,7 +32,9 @@ public:
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	void createFarm();
+	void redrawFarm() const;
 	void createWarehouse();
+	Farm* getFarm() const;
 
 	void go() const;
 
