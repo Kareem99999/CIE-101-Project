@@ -1,15 +1,19 @@
 #include "Animal.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include "../Core/GameObject.h"
 #include <iostream>
 using namespace std;
+
+point Chick::chickDimensions = { 50,50 };
+point Cow::cowDimensions = { 90,60 };
 
 Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
 	image_path = img_path;
 	curr_pos = r_point;
-	curr_vel.x = 1;
-	curr_vel.y = 1;
+	curr_vel.x = 4;
+	curr_vel.y = 4;
 
 }
 
@@ -20,28 +24,69 @@ void Animal::draw() const
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 }
 
+string Animal::getImagePath() const
+{
+	return image_path;
+}
+
 Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {}
 
+void Chick::velocity()
+{
+	static thread_local std::mt19937 gen{ std::random_device{}() };
+	std::uniform_int_distribution<int> dist(7, 9);
+	curr_vel.x = dist(gen);
+	curr_vel.y = dist(gen);
+}
+
+int Chick::getChickSizeInX()
+{
+	return chickDimensions.x;
+}
+
+int Chick::getChickSizeInY()
+{
+	return chickDimensions.y;
+}
+
 void Chick::moveStep()
 {
-	//TO DO: add code for cleanup and game exit here
-	/*
-	//draw image of this object in the field
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
-	*/
-	cout << "Icon Chick Clicked" << endl;
+	RefPoint.x += curr_vel.x;
+	RefPoint.y += curr_vel.y;
+	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { chickDimensions.x, chickDimensions.y }, 9, 7);
+	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
 }
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
-{};
+{}
 
+void Cow::velocity()
+{
+	static thread_local std::mt19937 gen{ std::random_device{}() };
+	std::uniform_int_distribution<int> dist(3,4);
+	curr_vel.x = dist(gen);
+	curr_vel.y = dist(gen);
+}
+
+int Cow::getCowSizeInX()
+{
+	return cowDimensions.x;
+}
+
+int Cow::getCowSizeInY()
+{
+	return cowDimensions.y;
+}
 
 void Cow::moveStep()
 {
-	//TO DO: add code for cleanup and game exit here
-	cout << "Icon Cow Clicked" << endl;
+	window* pWind = pGame->getWind();
+	RefPoint.x += curr_vel.x;
+	RefPoint.y += curr_vel.y;
+	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
+	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
 
 }
 

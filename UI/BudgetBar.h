@@ -5,17 +5,15 @@
 #include <random>
 #include <limits>
 
-//Ranges for generating a random location for the animals
-const int range_min_x = 50;
-const int range_max_x = config.windWidth - 50;
-const int range_min_y = (config.toolBarHeight * 2) + 50;
-const int range_max_y = config.windHeight - config.statusBarHeight - 50;
-
 //Base class for all toolbar icons 
 class BudgetbarIcon :public Drawable
 {
-private:
+protected:
 	//string image_path;
+	static int range_min_x;
+	static int range_max_x;
+	static int range_min_y;
+	static int range_max_y;
 	int static AnimalsCounter;
 public:
 	string image_path;
@@ -24,13 +22,17 @@ public:
 	virtual void onClick() = 0;   //The action that should be taken when this icon is clicked
 	int static  getAnimalCounter();
 	void static  increaseAnimals();
+	void static setRangeMinX(int valueMinX);
+	void static setRangeMaxX(int valueMaxX);
+	void static setRangeMinY(int valueMinY);
+	void static setRangeMaxY(int valueMaxY);
 };
 
 class ChickIcon : public BudgetbarIcon
 {
 public:
-	Chick** chickList; //an array of Chick pointers
-	int count = 0;
+	static Chick** chickList; //an array of Chick pointers
+	static int count;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };
@@ -38,8 +40,8 @@ public:
 class CowIcon : public BudgetbarIcon
 {
 public:	
-	Cow** cowList;
-	int count = 0;
+	static Cow** cowList;
+	static int count;
 	CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };
