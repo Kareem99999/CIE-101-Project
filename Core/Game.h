@@ -2,6 +2,7 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
+#include "Timer.h"
 #include "../Core/GameObject.h"
 
 class Game
@@ -13,6 +14,7 @@ private:
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
 	FoodArea* gameFoodArea;
+	Timer* gameTimer;
 
 public:
 	int budget = 20000;
@@ -27,6 +29,7 @@ public:
 	void createToolbar();
 	void createBudgetbar();
 	void clearBudget() const;
+	void createTimer();
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
 

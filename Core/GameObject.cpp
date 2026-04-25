@@ -3,8 +3,6 @@
 #include "../Config/GameConfig.h"
 #include <random>
 
-color GameObject::fillColor = BLACK;
-color GameObject::borderColor = BLACK;
 int Farm::margin = 10;
 int Farm::FarmWidth = 10;
 int Farm::FarmHeight = 10;

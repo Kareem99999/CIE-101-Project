@@ -4,8 +4,8 @@
 class GameObject : public Drawable
 {
 protected:
-	static color fillColor;	//game object fill color
-	static color borderColor;	//game object border color
+	color fillColor;	//game object fill color
+	color borderColor;	//game object border color
 
 public:
 	GameObject(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
@@ -54,6 +54,6 @@ protected:
 public:
 	FoodArea(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
 	void draw() const override;
-	void setFoodAreadim(int width, int height) { FoodAreaWidth = width, FoodAreaHeight = height }
+	void setFoodAreadim(int width, int height);
 
 };
