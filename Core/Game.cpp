@@ -2,7 +2,6 @@
 #include "../Config/GameConfig.h"
 #include "GameObject.h"
 #include "../UI/BudgetBar.h"
-#include "../Core/Timer.h"
 #include <thread>
 #include <chrono>
 
@@ -20,6 +19,7 @@ Game::Game()
 	createWarehouse();
 	createFarm();
 	createFoodArea();
+	//createWolf();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -32,6 +32,31 @@ Game::Game()
 	//7- Create and clear the status bar
 	clearStatusBar();
 	createTimer();
+}
+
+
+// Timer implementations (moved here so Timer is merged with Game files)
+TIME Timer::delay = TIMER::now();
+Timer::Timer(int duration) {
+	start = TIMER::now();
+	end = start + std::chrono::milliseconds(duration);
+}
+
+void Timer::setDuration(int Duration) {
+	start = TIMER::now();
+	end = start + std::chrono::milliseconds(Duration);
+}
+
+bool Timer::check() const {
+	return (TIMER::now() >= end);
+}
+
+long long Timer::elapsed() const {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - start).count();
+}
+
+long long Timer::remaining() const {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count();
 }
 
 Game::~Game()
@@ -110,6 +135,12 @@ void Game::redrawFarm() const
 	gameFoodArea->draw();
 	gameWarehouse->draw();
 }
+
+//void Game::createWolf()
+//{
+//	gameWolf = new Wolf(this, point {200, 200}, 70, 70, "images\\wolf.jpeg");
+//	gameWolf->draw();
+//}
 
 void Game::createWarehouse(){
 	point WarehouseRef;
@@ -223,6 +254,7 @@ void Game::go() const
 			redrawFarm();	//Get the coordinates of the user click
 			for (int i = 0; i < ChickIcon::count; i++) { ChickIcon::chickList[i]->moveStep(); }
 			for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
+			//gameWolf->moveStep();
 			delay->setDuration(500);
 		}
 		getMouseClick(x, y);
