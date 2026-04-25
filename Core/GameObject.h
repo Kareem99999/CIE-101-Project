@@ -52,8 +52,8 @@ protected:
 	int FoodAreaWidth = 0;
 	int FoodAreaHeight = 0;
 public:
-	int Foodcounter = 5;
 	FoodArea(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
 	void draw() const override;
 	void setFoodAreadim(int width, int height);
+
 };

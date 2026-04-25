@@ -2,8 +2,25 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
-#include "../Core/Timer.h"
+#include <chrono>
 #include "../Core/GameObject.h"
+
+using TIMER = std::chrono::steady_clock;
+using TIME = TIMER::time_point;
+
+class Timer {
+private:
+	TIME start = TIME();
+	TIME end = TIME();
+	static TIME delay;
+public:
+	Timer(int duration);
+	void setDuration(int Duration);
+	bool check() const;
+	//bool delayed(int duration) const;
+	long long elapsed() const;
+	long long remaining() const;
+};
 
 class Game
 {
@@ -15,6 +32,7 @@ private:
 	Warehouse* gameWarehouse;
 	FoodArea* gameFoodArea;
 	Timer* gameTimer;
+	//Wolf* gameWolf;
 
 public:
 	int budget = 20000;
@@ -30,6 +48,7 @@ public:
 	void createBudgetbar();
 	void clearBudget() const;
 	void createTimer();
+	//void createWolf();
 	string modifyTimerToStandard() const;
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
