@@ -4,9 +4,7 @@
 
 class Animal :public Drawable
 {
-protected:
-	bool prevColl = false;
-	bool currColl = false;
+private:
 	string image_path;
 	// Timer variables for animals products
 	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -19,8 +17,7 @@ public:
 	virtual void draw() const override;
 	virtual void velocity() = 0;
 	virtual void moveStep() = 0;
-	void produce(int duration);
-	int TakeFood();
+	//void produce(int duration);
 };
 
 class Chick : public Animal
@@ -33,7 +30,6 @@ public:
 	int static getChickSizeInX();
 	int static getChickSizeInY();
 	virtual void moveStep();
-	void isCollCh();
 };
 
 class Cow : public Animal
@@ -46,5 +42,16 @@ public:
 	int static getCowSizeInX();
 	int static getCowSizeInY();
 	virtual void moveStep();
-	void isCollCo();
+};
+
+class Wolf : public Animal
+{
+private:
+	point static wolfDimensions;
+public:
+	Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void velocity();
+	int static getWolfSizeInX();
+	int static getWolfSizeInY();
+	virtual void moveStep();
 };

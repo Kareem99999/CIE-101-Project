@@ -7,6 +7,7 @@ using namespace std;
 
 point Chick::chickDimensions = { 50,50 };
 point Cow::cowDimensions = { 90,60 };
+point Wolf::wolfDimensions = { 70,70 };
 
 Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
@@ -27,48 +28,6 @@ void Animal::draw() const
 string Animal::getImagePath() const
 {
 	return image_path;
-}
-
-void Chick::isCollCh()
-{
-	prevColl = currColl;
-	if (curr_pos.x < (config.windWidth / 2) + 50 && curr_pos.x > config.windWidth / 2 && curr_pos.y < (config.windHeight / 2) + 50 && curr_pos.y > config.windHeight / 2 ) {
-		currColl = true;
-		cout << "A collision occured \n";
-	}
-	else if (curr_pos.x + 50 < (config.windWidth / 2) + 50 && curr_pos.x + 50 > config.windWidth / 2 && curr_pos.y + 50 < (config.windHeight / 2) + 50 && curr_pos.y + 50 > config.windHeight / 2 ) {
-		currColl = true;
-		cout << "A collision occured \n";
-	}
-	else { 
-		currColl = false; 
-	}
-}
-
-void Cow::isCollCo()
-{
-	prevColl = currColl;
-	if (curr_pos.x < (config.windWidth / 2) + 50 && curr_pos.x > config.windWidth / 2 && curr_pos.y < (config.windHeight / 2) + 50 && curr_pos.y > config.windHeight / 2) {
-		currColl = true;
-		cout << "A collision occured \n";
-	}
-	else if (curr_pos.x + 90 < (config.windWidth / 2) + 50 && curr_pos.x + 90 > config.windWidth / 2 && curr_pos.y + 60 < (config.windHeight / 2) + 50 && curr_pos.y + 60 > config.windHeight / 2) {
-		currColl = true;
-		cout << "A collision occured \n";
-	}
-	else {
-		currColl = false;
-	}
-}
-
-int Animal::TakeFood()
-{
-	if (currColl == true && prevColl == false) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
 }
 
 //// Timer for animals products
@@ -139,4 +98,35 @@ void Cow::moveStep()
 	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
 	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
 
+}
+
+Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
+	: Animal(r_pGame, r_point, r_width, r_height, img_path)
+{}
+
+void Wolf::velocity()
+{
+	static thread_local std::mt19937 gen{ std::random_device{}() };
+	std::uniform_int_distribution<int> dist(4, 6);
+	curr_vel.x = dist(gen);
+	curr_vel.y = dist(gen);
+}
+
+int Wolf::getWolfSizeInX()
+{
+	return wolfDimensions.x;
+}
+
+int Wolf::getWolfSizeInY()
+{
+	return wolfDimensions.y;
+}
+
+void Wolf::moveStep()
+{
+	window* pWind = pGame->getWind();
+	RefPoint.x += curr_vel.x;
+	RefPoint.y += curr_vel.y;
+	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { wolfDimensions.x, wolfDimensions.y }, 6, 4);
+	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
 }
