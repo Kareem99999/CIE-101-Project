@@ -2,6 +2,7 @@
 #include "../Config/GameConfig.h"
 #include "GameObject.h"
 #include "../UI/BudgetBar.h"
+#include "Timer.h"
 #include <thread>
 #include <chrono>
 
@@ -30,6 +31,7 @@ Game::Game()
 
 	//7- Create and clear the status bar
 	clearStatusBar();
+	createTimer();
 }
 
 Game::~Game()
@@ -140,6 +142,11 @@ void Game::createBudgetbar()
 	gameBudgetbar->draw();
 }
 
+void Game::createTimer()
+{
+	gameTimer = new Timer(240000);
+}
+
 
 void Game::clearBudget() const
 {
@@ -192,6 +199,7 @@ void Game::go() const
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	bool isExit = false;
+	Timer* delay = new Timer(500);
 
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
@@ -199,15 +207,17 @@ void Game::go() const
 
 	do
 	{
-		string status_message = "Level: 1, Timer: 4:00, Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
-		printMessage(status_message);
-		string budget_string = "BUDGET = $" + to_string(budget);
-		printBudget(budget_string);
-		redrawFarm();
-		//printBudget("BUDGET = $1000");
-		getMouseClick(x, y);	//Get the coordinates of the user click
-		for (int i = 0; i < ChickIcon::count; i++){ ChickIcon::chickList[i]->moveStep(); }
-		for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
+		if (delay->check()) {
+			string status_message = "Level: 1, Timer:" + to_string(gameTimer->remaining()) + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
+			printMessage(status_message);
+			string budget_string = "BUDGET = $" + to_string(budget);
+			printBudget(budget_string);
+			redrawFarm();	//Get the coordinates of the user click
+			for (int i = 0; i < ChickIcon::count; i++) { ChickIcon::chickList[i]->moveStep(); }
+			for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
+			delay->setDuration(500);
+		}
+		getMouseClick(x, y);
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
 		//{
 			//[1] If user clicks on the Toolbar
@@ -220,7 +230,7 @@ void Game::go() const
 			isExit = gameBudgetbar->handleClick(x, y);
 		}
 		//}
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	} while (!isExit);
 }
 
