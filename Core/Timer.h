@@ -8,7 +8,7 @@ private:
 	TIME end = TIME::min();
 public:
 	Timer(int);
-	long long setDuration(int duration);
+	void setDuration(int duration);
 	bool check() const;
 	long long elapsed() const;
 	void reset();
