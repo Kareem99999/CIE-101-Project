@@ -7,7 +7,7 @@ Timer::Timer(int duration = 60) {
 	end = start + std::chrono::seconds(duration);
 }
 
-long long Timer::setDuration(int duration) {
+void Timer::setDuration(int duration) {
 	end = start + std::chrono::seconds(duration);
 }
 
