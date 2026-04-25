@@ -29,6 +29,48 @@ string Animal::getImagePath() const
 	return image_path;
 }
 
+void Chick::isCollCh()
+{
+	prevColl = currColl;
+	if (curr_pos.x < (config.windWidth / 2) + 50 && curr_pos.x > config.windWidth / 2 && curr_pos.y < (config.windHeight / 2) + 50 && curr_pos.y > config.windHeight / 2 ) {
+		currColl = true;
+		cout << "A collision occured \n";
+	}
+	else if (curr_pos.x + 50 < (config.windWidth / 2) + 50 && curr_pos.x + 50 > config.windWidth / 2 && curr_pos.y + 50 < (config.windHeight / 2) + 50 && curr_pos.y + 50 > config.windHeight / 2 ) {
+		currColl = true;
+		cout << "A collision occured \n";
+	}
+	else { 
+		currColl = false; 
+	}
+}
+
+void Cow::isCollCo()
+{
+	prevColl = currColl;
+	if (curr_pos.x < (config.windWidth / 2) + 50 && curr_pos.x > config.windWidth / 2 && curr_pos.y < (config.windHeight / 2) + 50 && curr_pos.y > config.windHeight / 2) {
+		currColl = true;
+		cout << "A collision occured \n";
+	}
+	else if (curr_pos.x + 90 < (config.windWidth / 2) + 50 && curr_pos.x + 90 > config.windWidth / 2 && curr_pos.y + 60 < (config.windHeight / 2) + 50 && curr_pos.y + 60 > config.windHeight / 2) {
+		currColl = true;
+		cout << "A collision occured \n";
+	}
+	else {
+		currColl = false;
+	}
+}
+
+int Animal::TakeFood()
+{
+	if (currColl == true && prevColl == false) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
 //// Timer for animals products
 //void Animal::produce(int duration) {
 //	if (chrono::steady_clock::now() >= end) {
