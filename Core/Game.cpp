@@ -2,7 +2,7 @@
 #include "../Config/GameConfig.h"
 #include "GameObject.h"
 #include "../UI/BudgetBar.h"
-#include "Timer.h"
+#include "../Core/Timer.h"
 #include <thread>
 #include <chrono>
 
@@ -147,6 +147,14 @@ void Game::createTimer()
 	gameTimer = new Timer(240000);
 }
 
+string Game::modifyTimerToStandard() const
+{
+	int minutes = gameTimer->remaining() / 60000;
+	int seconds = (gameTimer->remaining() % 60000) / 1000;
+	string timer_string = to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + to_string(seconds);
+	return timer_string;
+}
+
 
 void Game::clearBudget() const
 {
@@ -199,7 +207,7 @@ void Game::go() const
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	bool isExit = false;
-	Timer* delay = new Timer(500);
+	Timer* delay = new Timer(250);
 
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
@@ -208,7 +216,7 @@ void Game::go() const
 	do
 	{
 		if (delay->check()) {
-			string status_message = "Level: 1, Timer:" + to_string(gameTimer->remaining()) + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
+			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
 			printMessage(status_message);
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);
