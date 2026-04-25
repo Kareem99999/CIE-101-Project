@@ -12,6 +12,7 @@ private:
 	Budgetbar* gameBudgetbar;
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
+	FoodArea* gameFoodArea;
 
 public:
 	int budget = 20000;
@@ -34,6 +35,7 @@ public:
 	void createFarm();
 	void redrawFarm() const;
 	void createWarehouse();
+	void createFoodArea();
 	Farm* getFarm() const;
 
 	void go() const;

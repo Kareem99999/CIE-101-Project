@@ -18,6 +18,7 @@ Game::Game()
 	//3 - create and draw the backgroundPlayingArea
 	createWarehouse();
 	createFarm();
+	createFoodArea();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -97,13 +98,15 @@ void Game::createFarm()
 	BudgetbarIcon::setRangeMaxX(FarmRef.x + Width - Farm::getMargin());
 	BudgetbarIcon::setRangeMinY(FarmRef.y + Farm::getMargin());
 	BudgetbarIcon::setRangeMaxY(FarmRef.y + Height - Farm::getMargin());
-	gameFarm = new Farm(this, FarmRef, Width, Height, GREEN, DARKGREEN);
+	gameFarm = new Farm(this, FarmRef, Width, Height, BROWN, DARKGREEN);
 	gameFarm->draw();
 }
 
 void Game::redrawFarm() const
 {
 	gameFarm->draw();
+	gameFoodArea->draw();
+	gameWarehouse->draw();
 }
 
 void Game::createWarehouse(){
@@ -117,6 +120,16 @@ void Game::createWarehouse(){
 	gameWarehouse->draw();
 }
 
+void Game::createFoodArea()
+{
+	point FoodAreaRef;
+	FoodAreaRef.x = config.windWidth / 2;
+	FoodAreaRef.y = config.windHeight / 2;
+	int Height = 50;
+	int width = 50;
+	gameFoodArea = new FoodArea(this, FoodAreaRef, width, Height, RED, BROWN); // this is a pointer for the game // food area ref : tells x , y
+	gameFoodArea->draw();
+}
 void Game::createBudgetbar()
 {
 	point budgetbarUpperleft;
@@ -182,6 +195,7 @@ void Game::go() const
 
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
+	pWind->DrawString(200, 200, "REAL FILE");
 
 	do
 	{
