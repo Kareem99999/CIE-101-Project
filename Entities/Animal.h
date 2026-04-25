@@ -4,7 +4,9 @@
 
 class Animal :public Drawable
 {
-private:
+protected:
+	bool prevColl = false;
+	bool currColl = false;
 	string image_path;
 	// Timer variables for animals products
 	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -18,6 +20,7 @@ public:
 	virtual void velocity() = 0;
 	virtual void moveStep() = 0;
 	void produce(int duration);
+	int TakeFood();
 };
 
 class Chick : public Animal
@@ -30,6 +33,7 @@ public:
 	int static getChickSizeInX();
 	int static getChickSizeInY();
 	virtual void moveStep();
+	void isCollCh();
 };
 
 class Cow : public Animal
@@ -42,4 +46,5 @@ public:
 	int static getCowSizeInX();
 	int static getCowSizeInY();
 	virtual void moveStep();
+	void isCollCo();
 };
