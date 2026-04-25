@@ -101,4 +101,5 @@ void FoodArea::draw() const
 	pWind->SetBrush(fillColor);
 	pWind->SetPen(borderColor, 4);
 	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + FoodAreaWidth, RefPoint.y + FoodAreaHeight);
+	pWind->DrawString(RefPoint.x + FoodAreaWidth / 2 - 10, RefPoint.y + FoodAreaHeight / 2 - 10, to_string(Foodcounter));
 }
