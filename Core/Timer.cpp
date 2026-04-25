@@ -23,6 +23,11 @@ long long Timer::elapsed() const {
 	// trunckate to seconds
 }
 
-void Timer::reset() const {
+long long Timer::remaining() const {
+	return std::chrono::duration_cast<std::chrono::seconds>(end - TIMER::now()).count();
+	// trunckate to seconds
+}
+
+void Timer::reset() {
 	start = TIMER::now();
 }

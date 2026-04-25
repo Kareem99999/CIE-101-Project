@@ -11,5 +11,6 @@ public:
 	long long setDuration(int duration);
 	bool check() const;
 	long long elapsed() const;
-	void reset() const;
+	void reset();
+	long long remaining() const;
 };
