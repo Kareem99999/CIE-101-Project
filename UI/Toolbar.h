@@ -56,11 +56,11 @@ enum ICONS //The icons of the toolbar (you should add more icons)
 {
 	//Note: Icons are ordered here as they appear in menu
 	//If you want to change the menu icons order, change the order here
-	ICON_START,		//Start icon
+	//ICON_START,		//Start icon
 	ICON_RESTART,
-	ICON_PAUSE,		//Pause icon
-	ICON_SAVE,		//Save icon
-	ICON_LOAD,		//Load icon
+	//ICON_PAUSE,		//Pause icon
+	//ICON_SAVE,		//Save icon
+	//ICON_LOAD,		//Load icon
 	//TODO: Add more icons names here
 	ICON_EXIT,		//Exit icon
 	ICON_COUNT		//no. of menu icons ==> This should be the last line in this enum

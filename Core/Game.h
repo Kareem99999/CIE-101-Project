@@ -2,7 +2,7 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
-#include "Timer.h"
+#include "../Core/Timer.h"
 #include "../Core/GameObject.h"
 
 class Game
@@ -30,6 +30,7 @@ public:
 	void createBudgetbar();
 	void clearBudget() const;
 	void createTimer();
+	string modifyTimerToStandard() const;
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
 
