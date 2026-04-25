@@ -47,3 +47,13 @@ public:
 	void draw() const override;
 };
 
+class FoodArea : public GameObject {
+protected:
+	int FoodAreaWidth = 0;
+	int FoodAreaHeight = 0;
+public:
+	FoodArea(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
+	void draw() const override;
+	void setFoodAreadim(int width, int height) { FoodAreaWidth = width, FoodAreaHeight = height }
+
+};

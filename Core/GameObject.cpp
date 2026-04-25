@@ -91,3 +91,16 @@ void Warehouse::draw() const
 	pWind->SetPen(borderColor, 4);
 	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + WarehouseWidth, RefPoint.y + WarehouseHeight);
 };
+FoodArea::FoodArea(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc) : GameObject(r_pGame, ref, r_width, r_height, fc, bc)
+{
+	FoodAreaWidth = r_width;
+	FoodAreaHeight = r_height;
+}
+
+void FoodArea::draw() const
+{
+	window* pWind = pGame->getWind();
+	pWind->SetBrush(fillColor);
+	pWind->SetPen(borderColor, 4);
+	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + FoodAreaWidth, RefPoint.y + FoodAreaHeight);
+}
