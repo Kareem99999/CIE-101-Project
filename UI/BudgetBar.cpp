@@ -5,6 +5,7 @@
 #include <iostream>
 using namespace std;
 
+int WaterIcon::amount = 0;
 int BudgetbarIcon::AnimalsCounter = 0;
 int ChickIcon::count = 0;
 int CowIcon::count = 0;
@@ -159,11 +160,15 @@ void WaterIcon::onClick()
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
 		pGame->printBudget(budget_string);
 
-		// print water amount to console or status bar
+		// print water amount
 		string msg = "Water amount = " + to_string(amount);
 		cout << msg << endl;
-		pGame->printMessage(msg);
 	}
+}
+
+int WaterIcon::waterAmount()
+{
+	return amount;
 }
 
 
@@ -185,6 +190,8 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 	iconsList[ICON_CHICK] = new ChickIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_CHICK]);
 	p.x += config.iconWidth;
 	iconsList[ICON_COW] = new CowIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_COW]);
+	p.x += config.iconWidth;
+	iconsList[ICON_WATER] = new WaterIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_WATER]);
 	p.x += config.iconWidth;
 	}
 
