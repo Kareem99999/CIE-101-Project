@@ -19,7 +19,6 @@ Game::Game()
 	createWarehouse();
 	createFarm();
 	createFoodArea();
-	createWolf();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -32,6 +31,7 @@ Game::Game()
 	//7- Create and clear the status bar
 	clearStatusBar();
 	createTimer();
+	gameWolf = nullptr;
 }
 
 
@@ -242,12 +242,14 @@ Farm* Game::getFarm() const
 	return gameFarm;
 }
 
-void Game::go() const
+void Game::go() 
 {
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
+	int static level = 1;
 	bool isExit = false;
 	Timer* delay = new Timer(250);
+	Timer* wolf_delay = new Timer(10 * 1000);
 
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
@@ -255,6 +257,13 @@ void Game::go() const
 
 	do
 	{
+		if (level == 1) {
+			if (wolf_delay->check())
+			{
+				createWolf();
+				wolf_delay->setDuration(60 * 1000);
+			}
+		}
 		if (delay->check()) {
 			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
 			printMessage(status_message);
@@ -263,7 +272,9 @@ void Game::go() const
 			redrawFarm();	//Get the coordinates of the user click
 			for (int i = 0; i < ChickIcon::count; i++) { ChickIcon::chickList[i]->moveStep(); }
 			for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
-			gameWolf->moveStep();
+			if (gameWolf) {
+				gameWolf->moveStep();
+			}
 			delay->setDuration(500);
 		}
 		getMouseClick(x, y);
