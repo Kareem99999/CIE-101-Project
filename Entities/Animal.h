@@ -7,8 +7,6 @@ class Animal :public Drawable
 private:
 	string image_path;
 	// Timer variables for animals products
-	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-	std::chrono::steady_clock::time_point end;
 public:
 	point curr_pos;
 	point curr_vel;
