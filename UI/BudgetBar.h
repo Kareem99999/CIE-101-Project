@@ -22,6 +22,10 @@ public:
 	virtual void onClick() = 0;   //The action that should be taken when this icon is clicked
 	int static  getAnimalCounter();
 	void static increaseAnimals();
+	int static  getRangeMinX();
+	int static getRangeMaxX();
+	int static getRangeMinY();
+	int static getRangeMaxY();
 	void static setRangeMinX(int valueMinX);
 	void static setRangeMaxX(int valueMaxX);
 	void static setRangeMinY(int valueMinY);
