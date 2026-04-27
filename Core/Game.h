@@ -61,7 +61,7 @@ public:
 	void createFoodArea();
 	Farm* getFarm() const;
 
-	void go() const;
+	void go();
 
 	window* getWind() const;		//returns a pointer to the graphics window
 };
