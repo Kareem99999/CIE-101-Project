@@ -247,7 +247,7 @@ void Game::go() const
 	do
 	{
 		if (delay->check()) {
-			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter());
+			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
 			printMessage(status_message);
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);

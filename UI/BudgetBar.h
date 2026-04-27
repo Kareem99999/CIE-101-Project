@@ -48,10 +48,11 @@ public:
 
 class WaterIcon : public BudgetbarIcon
 {
+	int static amount;
 public:
-	int amount = 0; // counter for water amount
 	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
+	int static waterAmount();
 };
 // TO DO: The rest of icons in the toolbar
 
