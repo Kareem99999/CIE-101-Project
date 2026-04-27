@@ -22,11 +22,14 @@ class Chick : public Animal
 {
 private:
 	point static chickDimensions;
+	bool prev_coll = false;
+	bool current_coll = false;
 public:
 	Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void velocity();
 	int static getChickSizeInX();
 	int static getChickSizeInY();
+	int ifColl();
 	virtual void moveStep();
 };
 
@@ -34,12 +37,15 @@ class Cow : public Animal
 {
 private:
 	point static cowDimensions;
+	bool prev_coll = false;
+	bool current_coll = false;
 public:
 	Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void velocity();
 	int static getCowSizeInX();
 	int static getCowSizeInY();
 	virtual void moveStep();
+	int ifColl();
 };
 
 class Wolf : public Animal

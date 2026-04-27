@@ -18,6 +18,52 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 
 }
 
+int Chick::ifColl() {
+	this->prev_coll = this->current_coll;
+	FoodArea* FoodA = pGame->getFoodArea();
+	point FoodAsize = FoodA->getFoodAreaDim();
+	point FoodAref = FoodA->getFoodAreaRef();
+	if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else {	current_coll = false;	}
+	if (FoodA != nullptr) {
+		if (current_coll == true && prev_coll == false) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	else return 0;
+};
+
+
+int Cow::ifColl() {
+	prev_coll = current_coll;
+	FoodArea* FoodA = pGame->getFoodArea();
+	point FoodAsize = FoodA->getFoodAreaDim();
+	point FoodAref = FoodA->getFoodAreaRef();
+	if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+	else {
+		current_coll = false;
+	}
+	if (FoodA != nullptr) {
+		if (current_coll == true && prev_coll == false) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	else return 0;
+};
+
+
 void Animal::draw() const
 {
 	//draw image of this object
