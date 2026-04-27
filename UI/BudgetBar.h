@@ -50,14 +50,6 @@ public:
 	virtual void onClick();
 };
 
-class WaterIcon : public BudgetbarIcon
-{
-	int static amount;
-public:
-	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-	virtual void onClick();
-	int static waterAmount();
-};
 // TO DO: The rest of icons in the toolbar
 
 enum ANIMAL_ICONS //The icons of the toolbar (you should add more icons)
@@ -89,3 +81,12 @@ public:
 
 };
 
+class WaterIcon : public BudgetbarIcon
+{
+	int static amount;
+public:
+	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
+	int static waterAmount();
+	void decreaseWater();
+};

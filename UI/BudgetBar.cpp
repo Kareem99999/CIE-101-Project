@@ -85,11 +85,6 @@ CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string
 	}
 }
 
-WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
-{
-	amount = 0;
-}
-
 
 void ChickIcon::onClick()
 {
@@ -162,30 +157,6 @@ void CowIcon::onClick()
 	}
 }
 
-void WaterIcon::onClick()
-{
-	cout << "Icon Water Clicked" << endl;
-	// cost 20
-	if (pGame->budget >= 20) {
-		pGame->budget -= 20;
-		// increase water amount and print
-		// find this icon instance to access amount (this)
-		amount++;
-		pGame->clearBudget();
-		string budget_string = "BUDGET = $" + to_string(pGame->budget);
-		pGame->printBudget(budget_string);
-
-		// print water amount
-		string msg = "Water amount = " + to_string(amount);
-		cout << msg << endl;
-	}
-}
-
-int WaterIcon::waterAmount()
-{
-	return amount;
-}
-
 
 Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : Drawable(r_pGame, r_point, r_width, r_height)
 {
@@ -244,4 +215,42 @@ bool Budgetbar::handleClick(int x, int y)
 
 	return false;
 
+}
+
+// Water thingies
+
+WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
+{
+	amount = 0;
+}
+
+int WaterIcon::waterAmount()
+{
+	return amount;
+}
+
+void WaterIcon::decreaseWater()
+{
+	if (amount > 0) {
+		amount--;
+	}
+}
+
+void WaterIcon::onClick()
+{
+	cout << "Icon Water Clicked" << endl;
+	// cost 20
+	if (pGame->budget >= 20) {
+		pGame->budget -= 20;
+		// increase water amount and print
+		// find this icon instance to access amount (this)
+		amount++;
+		pGame->clearBudget();
+		string budget_string = "BUDGET = $" + to_string(pGame->budget);
+		pGame->printBudget(budget_string);
+
+		// print water amount
+		string msg = "Water amount = " + to_string(amount);
+		cout << msg << endl;
+	}
 }
