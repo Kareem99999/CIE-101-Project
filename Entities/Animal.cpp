@@ -7,7 +7,7 @@ using namespace std;
 
 point Chick::chickDimensions = { 50,50 };
 point Cow::cowDimensions = { 90,60 };
-point Wolf::wolfDimensions = { 70,70 };
+point Wolf::wolfDimensions = { 80,50 };
 
 Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
