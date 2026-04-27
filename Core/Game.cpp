@@ -132,7 +132,7 @@ void Game::createFarm()
 void Game::redrawFarm() const
 {
 	gameFarm->draw();
-	gameFoodArea->draw();
+	if (gameFoodArea != nullptr) gameFoodArea->draw();
 	gameWarehouse->draw();
 }
 
@@ -169,7 +169,7 @@ void Game::createFoodArea()
 	FoodAreaRef.y = config.windHeight / 2;
 	int Height = 50;
 	int width = 50;
-	gameFoodArea = new FoodArea(this, FoodAreaRef, width, Height, RED, BROWN); // this is a pointer for the game // food area ref : tells x , y
+	gameFoodArea = new FoodArea(this, FoodAreaRef, width, Height, GREEN, GREEN); // this is a pointer for the game // food area ref : tells x , y
 	gameFoodArea->draw();
 }
 void Game::createBudgetbar()
@@ -242,6 +242,11 @@ Farm* Game::getFarm() const
 	return gameFarm;
 }
 
+FoodArea* Game::getFoodArea() const
+{
+	return gameFoodArea;
+}
+
 void Game::go() 
 {
 	//This function reads the position where the user clicks to determine the desired operation
@@ -261,6 +266,7 @@ void Game::go()
 			if (wolf_delay->check())
 			{
 				createWolf();
+
 				wolf_delay->setDuration(60 * 1000);
 			}
 		}
@@ -270,8 +276,22 @@ void Game::go()
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);
 			redrawFarm();	//Get the coordinates of the user click
-			for (int i = 0; i < ChickIcon::count; i++) { ChickIcon::chickList[i]->moveStep(); }
-			for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
+			for (int i = 0; i < ChickIcon::count; i++) { 
+				ChickIcon::chickList[i]->moveStep(); 
+				if (gameFoodArea) {
+					gameFoodArea->decreaseFood(ChickIcon::chickList[i]->ifColl());
+				}
+			}
+			for (int i = 0; i < CowIcon::count; i++) { 
+				CowIcon::cowList[i]->moveStep();
+				if (gameFoodArea) {
+					gameFoodArea->decreaseFood(CowIcon::cowList[i]->ifColl());
+				}
+			}
+			if (gameFoodArea != nullptr && gameFoodArea->getfoodcounter() <= 0) {
+				delete gameFoodArea;
+				gameFoodArea = nullptr;
+			}
 			if (gameWolf) {
 				gameWolf->moveStep();
 			}

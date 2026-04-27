@@ -60,6 +60,7 @@ public:
 	void createWarehouse();
 	void createFoodArea();
 	Farm* getFarm() const;
+	FoodArea* getFoodArea() const;
 
 	void go();
 
