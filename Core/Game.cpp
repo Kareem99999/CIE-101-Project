@@ -19,7 +19,7 @@ Game::Game()
 	createWarehouse();
 	createFarm();
 	createFoodArea();
-	//createWolf();
+	createWolf();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -136,11 +136,20 @@ void Game::redrawFarm() const
 	gameWarehouse->draw();
 }
 
-//void Game::createWolf()
-//{
-//	gameWolf = new Wolf(this, point {200, 200}, 70, 70, "images\\wolf.jpeg");
-//	gameWolf->draw();
-//}
+void Game::createWolf()
+{
+	point p;
+	std::random_device rd1;
+	std::mt19937 gen1(rd1());
+	std::uniform_int_distribution<int> dist1(BudgetbarIcon::getRangeMinX(), (BudgetbarIcon::getRangeMaxX() - Wolf::getWolfSizeInX()));
+	p.x = dist1(gen1);
+	std::random_device rd2;
+	std::mt19937 gen2(rd2());
+	std::uniform_int_distribution<int> dist2(BudgetbarIcon::getRangeMinY(), (BudgetbarIcon::getRangeMaxY() - Wolf::getWolfSizeInY()));
+	p.y = dist2(gen2);
+	gameWolf = new Wolf(this, p, Wolf::getWolfSizeInX(),Wolf::getWolfSizeInY(), "images\\wolf.jpg");
+	gameWolf->draw();
+}
 
 void Game::createWarehouse(){
 	point WarehouseRef;
@@ -254,7 +263,7 @@ void Game::go() const
 			redrawFarm();	//Get the coordinates of the user click
 			for (int i = 0; i < ChickIcon::count; i++) { ChickIcon::chickList[i]->moveStep(); }
 			for (int i = 0; i < CowIcon::count; i++) { CowIcon::cowList[i]->moveStep(); }
-			//gameWolf->moveStep();
+			gameWolf->moveStep();
 			delay->setDuration(500);
 		}
 		getMouseClick(x, y);
