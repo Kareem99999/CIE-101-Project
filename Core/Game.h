@@ -32,7 +32,7 @@ private:
 	Warehouse* gameWarehouse;
 	FoodArea* gameFoodArea;
 	Timer* gameTimer;
-	//Wolf* gameWolf;
+	Wolf* gameWolf;
 
 public:
 	int budget = 20000;
@@ -48,7 +48,7 @@ public:
 	void createBudgetbar();
 	void clearBudget() const;
 	void createTimer();
-	//void createWolf();
+	void createWolf();
 	string modifyTimerToStandard() const;
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
