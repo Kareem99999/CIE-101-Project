@@ -18,7 +18,7 @@ RestartIcon::RestartIcon(Game* r_pGame, point r_point, int r_width, int r_height
 
 void RestartIcon::onClick()
 {
-	//TO DO: add code for restarting the game here
+	//pGame->restart();
 }
 StartIcon::StartIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
@@ -32,14 +32,14 @@ SaveIcon::SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, stri
 }
 void SaveIcon::onClick()
 {
-	//TO DO: add code for saving the game here
+	pGame->saving();
 }
 LoadiIcon::LoadiIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
 }
 void LoadiIcon::onClick()
 {
-	//TO DO: add code for loading the game here
+	pGame->loading();
 }
 PauseIcon::PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {

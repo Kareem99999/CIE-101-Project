@@ -170,7 +170,7 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 	p.x = 0;
 	p.y = config.toolBarHeight;
 
-	iconsList = new BudgetbarIcon * [ANIMAL_COUNT];
+	iconsList = new BudgetbarIcon * [BUDGET_ICON_COUNT];
 
 	//For each icon in the tool bar create an object 
 	iconsList[ICON_CHICK] = new ChickIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_CHICK]);
@@ -183,14 +183,23 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 
 Budgetbar::~Budgetbar()
 {
-	for (int i = 0; i < ICON_COUNT; i++)
+	for (int i = 0; i < ChickIcon::count; i++)
+		delete ChickIcon::chickList[i];
+
+	delete[] ChickIcon::chickList;
+	for (int i = 0; i < CowIcon::count; i++)
+		delete CowIcon::cowList[i];
+
+	delete[] CowIcon::cowList;
+	for (int i = 0; i < BUDGET_ICON_COUNT; i++)
 		delete iconsList[i];
-	delete iconsList;
+
+	delete[] iconsList;
 }
 
 void Budgetbar::draw() const
 {
-	for (int i = 0; i < ANIMAL_COUNT; i++)
+	for (int i = 0; i < BUDGET_ICON_COUNT; i++)
 	iconsList[i]->draw();
 	window* pWind = pGame->getWind();
 	pWind->SetPen(BLACK, 3);
@@ -199,7 +208,7 @@ void Budgetbar::draw() const
 
 bool Budgetbar::handleClick(int x, int y)
 {
-	if (x > ANIMAL_COUNT * config.iconWidth)	//click outside toolbar boundaries
+	if (x > BUDGET_ICON_COUNT * config.iconWidth)	//click outside toolbar boundaries
 		return false;
 
 
