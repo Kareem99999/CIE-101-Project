@@ -36,6 +36,7 @@ private:
 
 public:
 	int budget = 20000;
+	bool timeToRestart = false;
 	Game();
 	~Game();
 
@@ -62,7 +63,10 @@ public:
 	Farm* getFarm() const;
 	FoodArea* getFoodArea() const;
 
-	void go();
+	bool go();
+	void saving() const;
+	void loading();
+	void restart();
 
 	window* getWind() const;		//returns a pointer to the graphics window
 };

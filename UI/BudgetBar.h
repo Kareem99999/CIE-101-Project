@@ -64,14 +64,14 @@ enum ANIMAL_ICONS //The icons of the toolbar (you should add more icons)
 
 	ICON_WATER,
 
-	ANIMAL_COUNT		//no. of menu icons ==> This should be the last line in this enum
+	BUDGET_ICON_COUNT		//no. of menu icons ==> This should be the last line in this enum
 };
 
 class Budgetbar : public Drawable
 {
 private:
 	BudgetbarIcon** iconsList; //an array of toolbarIcon pointers
-	string iconsImages[ANIMAL_COUNT];
+	string iconsImages[BUDGET_ICON_COUNT];
 
 public:
 	Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height);

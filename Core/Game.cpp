@@ -4,6 +4,7 @@
 #include "../UI/BudgetBar.h"
 #include <thread>
 #include <chrono>
+#include <fstream>
 
 Game::Game()
 {
@@ -61,6 +62,14 @@ long long Timer::remaining() const {
 
 Game::~Game()
 {
+	delete gameToolbar;
+	delete gameBudgetbar;
+	delete gameFarm;
+	delete gameWarehouse;
+	delete gameFoodArea;
+	delete gameTimer;
+	delete gameWolf;
+	//delete pWind;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
@@ -247,13 +256,35 @@ FoodArea* Game::getFoodArea() const
 	return gameFoodArea;
 }
 
-void Game::go() 
+void Game::saving() const{
+	ofstream SaveFile("SaveFile.txt");
+	SaveFile << budget << " " << gameTimer->remaining() << "\n";
+	SaveFile.close();
+	printMessage("Game Saved!");
+}
+
+void Game::loading() {
+	ifstream SaveFile("SaveFile.txt");
+	if (SaveFile) {
+		int currentTime;
+		SaveFile >> budget >> currentTime;
+		gameTimer->setDuration(currentTime);
+	}
+	SaveFile.close();
+	printMessage("Game Loaded!");
+}
+
+void Game::restart() {
+	timeToRestart = true;
+}
+
+bool Game::go() 
 {
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	int static level = 1;
 	bool isExit = false;
-	Timer* delay = new Timer(250);
+	Timer* delay = new Timer(300);
 	Timer* wolf_delay = new Timer(10 * 1000);
 
 	//Change the title
@@ -270,6 +301,7 @@ void Game::go()
 				wolf_delay->setDuration(60 * 1000);
 			}
 		}
+		if (timeToRestart) { return true; }
 		if (delay->check()) {
 			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
 			printMessage(status_message);
@@ -295,7 +327,7 @@ void Game::go()
 			if (gameWolf) {
 				gameWolf->moveStep();
 			}
-			delay->setDuration(500);
+			delay->setDuration(300);
 		}
 		getMouseClick(x, y);
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
@@ -310,8 +342,8 @@ void Game::go()
 			isExit = gameBudgetbar->handleClick(x, y);
 		}
 		//}
-		//std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	} while (!isExit);
+	return !isExit;
 }
 
 
