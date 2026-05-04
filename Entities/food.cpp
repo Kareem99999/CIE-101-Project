@@ -8,7 +8,7 @@ food :: food(Game* r_pGame, point r_point, int r_width, int r_height, string img
 	name = "";
 	foodImagePath = img_path;
 }
-grass::grass(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
+/*grass::grass(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: food(r_pGame, r_point, r_width, r_height, img_path)
 {
 	name = "GRASS";
@@ -21,7 +21,7 @@ void grass::buy()
 {
 	if (pGame->budget >= buyprice) {
 		amount++;
-		pGame->addToBudget(-buyprice);
+		pGame->budget -= buyprice;
 	}
 }
 void grass::sell()
@@ -32,6 +32,7 @@ void grass::addFood(int amount)
 {
 	this->amount += amount;
 }
+*/
 void food::draw() const
 {
 	//draw image of this object
@@ -39,8 +40,8 @@ void food::draw() const
 	pWind->DrawImage(foodImagePath, RefPoint.x, RefPoint.y, width, height);
 }
 
-eggs::eggs(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
-	: food(r_pGame, r_point, r_width, r_height, img_path)
+eggs::eggs(Game* r_pGame, point r_point, int r_width, int r_height)
+	: food(r_pGame, r_point, r_width, r_height, "..\\images\\EGG.jpg")
 {
 	name = "EGGS";
 	buyprice = 0;
@@ -60,21 +61,21 @@ void eggs :: draw() const
 {
 	//draw image of this object
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(foodImagePath, RefPoint.x, RefPoint.y, width, height);
+	pWind->DrawImage("images\\EGG.jpeg", RefPoint.x, RefPoint.y, width, height);
 }
 void eggs::sell()
 {
 	if (amount > 0)
 	{
 		amount--;
-		pGame->addToBudget(sellprice);
+		pGame->budget += (sellprice);
 	}
 }
 
 
 
-milk::milk(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
-	: food(r_pGame, r_point, r_width, r_height, img_path)
+milk::milk(Game* r_pGame, point r_point, int r_width, int r_height)
+	: food(r_pGame, r_point, r_width, r_height, "images\\MILK.jpg")
 {
 	name = "MILK";
 	buyprice = 0;
@@ -101,7 +102,7 @@ void milk::sell()
 	if (amount > 0)
 	{
 		amount--;
-		pGame->addBudget(sellprice);
+		pGame->budget += sellprice;
 	}
 }
 // to do see wtf is the addBugdet function and if not there do it
