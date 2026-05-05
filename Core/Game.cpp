@@ -19,7 +19,7 @@ Game::Game()
 	//3 - create and draw the backgroundPlayingArea
 	createWarehouse();
 	createFarm();
-	createFoodArea();
+	//createFoodArea();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -66,7 +66,7 @@ Game::~Game()
 	delete gameBudgetbar;
 	delete gameFarm;
 	delete gameWarehouse;
-	delete gameFoodArea;
+	//delete gameFoodArea;
 	delete gameTimer;
 	delete gameWolf;
 	//delete pWind;
@@ -78,7 +78,9 @@ clicktype Game::getMouseClick(int& x, int& y) const
 
 }
 
+void Game::decreaseeggscount() { eggsCounter--; }
 
+void Game::decreasemilkcount() { milkCounter--; }
 
 string Game::getSrting() const
 {
@@ -141,7 +143,7 @@ void Game::createFarm()
 void Game::redrawFarm() const
 {
 	gameFarm->draw();
-	if (gameFoodArea != nullptr) gameFoodArea->draw();
+	for (int i = 0; i < WaterIcon::waterAmount(); i++) if ( WaterIcon::FoodAreaList[i] != nullptr) WaterIcon::FoodAreaList[i]->draw();
 	gameWarehouse->draw();
 }
 
@@ -171,16 +173,17 @@ void Game::createWarehouse(){
 	gameWarehouse->draw();
 }
 
-void Game::createFoodArea()
+/*void Game::createFoodArea()
 {
 	point FoodAreaRef;
 	FoodAreaRef.x = config.windWidth / 2;
 	FoodAreaRef.y = config.windHeight / 2;
 	int Height = 50;
 	int width = 50;
-	gameFoodArea = new FoodArea(this, FoodAreaRef, width, Height, GREEN, GREEN); // this is a pointer for the game // food area ref : tells x , y
+	gameFoodArea = new FoodArea(this, FoodAreaRef); // this is a pointer for the game // food area ref : tells x , y
 	gameFoodArea->draw();
-}
+}*/
+
 void Game::createBudgetbar()
 {
 	point budgetbarUpperleft;
@@ -211,6 +214,14 @@ void Game::clearBudget() const
 	pWind->SetPen(config.bkGrndColor, 1);
 	pWind->SetBrush(config.bkGrndColor);
 	pWind->DrawRectangle(config.windWidth - 500, config.toolBarHeight, config.windWidth, 2*config.toolBarHeight);
+}
+
+int Game::getEggcount() {
+	return eggsCounter;
+}
+
+int Game::getMilkcount() {
+	return milkCounter;
 }
 
 void Game::printBudget(string msg) const
@@ -251,10 +262,10 @@ Farm* Game::getFarm() const
 	return gameFarm;
 }
 
-FoodArea* Game::getFoodArea() const
+/*FoodArea* Game::getFoodArea() const
 {
 	return gameFoodArea;
-}
+}*/
 
 void Game::saving() const{
 	ofstream SaveFile("SaveFile.txt");
@@ -278,8 +289,7 @@ void Game::restart() {
 	timeToRestart = true;
 }
 
-bool Game::go() 
-{
+bool Game::go() {
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	int static level = 1;
@@ -308,41 +318,70 @@ bool Game::go()
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);
 			redrawFarm();	//Get the coordinates of the user click
-			for (int i = 0; i < ChickIcon::count; i++) { 
-				ChickIcon::chickList[i]->moveStep(); 
-				if (gameFoodArea) {
-					gameFoodArea->decreaseFood(ChickIcon::chickList[i]->ifColl());
+			for (int i = 0; i < totalcreatedeggs; i++) {
+				if (gameEggslist[i]) {
+					gameEggslist[i]->draw();
 				}
 			}
-			for (int i = 0; i < CowIcon::count; i++) { 
+			for (int i = 0; i < totalcreatedmilk; i++) {
+				if (gameMilklist[i]) {
+					gameMilklist[i]->draw();
+				}
+			}
+			for (int i = 0; i < ChickIcon::count; i++) {
+				ChickIcon::chickList[i]->moveStep();
+				ChickIcon::chickList[i]->ifColl();
+				for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+					if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
+						delete WaterIcon::FoodAreaList[x];
+						WaterIcon::FoodAreaList[x] = nullptr;
+					}
+				}
+				if (ChickIcon::chickList[i]->getFoodeaten() != 0 && ChickIcon::chickList[i]->getFoodeaten() % 2 == 0) {
+					gameEggslist[totalcreatedeggs] = new eggs(this, ChickIcon::chickList[i]->curr_pos, 20, 20);
+					gameEggslist[totalcreatedeggs]->draw();
+					totalcreatedeggs++;
+					eggsCounter++;
+				}
+			}
+			for (int i = 0; i < CowIcon::count; i++) {
 				CowIcon::cowList[i]->moveStep();
-				if (gameFoodArea) {
-					gameFoodArea->decreaseFood(CowIcon::cowList[i]->ifColl());
+				CowIcon::cowList[i]->ifColl();
+				for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+					if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
+						delete WaterIcon::FoodAreaList[x];
+						WaterIcon::FoodAreaList[x] = nullptr;
+					}
 				}
-			}
-			if (gameFoodArea != nullptr && gameFoodArea->getfoodcounter() <= 0) {
-				delete gameFoodArea;
-				gameFoodArea = nullptr;
+				if (CowIcon::cowList[i]->getFoodeaten() != 0 && CowIcon::cowList[i]->getFoodeaten() % 4 == 0) {
+					gameMilklist[totalcreatedmilk] = new milk(this, CowIcon::cowList[i]->curr_pos, 20, 20);
+					gameMilklist[totalcreatedmilk]->draw();
+					totalcreatedmilk++;
+					milkCounter++;
+				}
 			}
 			if (gameWolf) {
 				gameWolf->moveStep();
 			}
-			delay->setDuration(300);
-		}
-		getMouseClick(x, y);
-		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
-		//{
-			//[1] If user clicks on the Toolbar
-		if (y >= 0 && y < config.toolBarHeight)
-		{
-			isExit = gameToolbar->handleClick(x, y);
-		}
-		else if (y >= config.toolBarHeight && y < 2*config.toolBarHeight)
-		{
-			isExit = gameBudgetbar->handleClick(x, y);
-		}
-		//}
-	} while (!isExit);
+				delay->setDuration(300);
+			}
+			getMouseClick(x, y);
+			if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+				gameWarehouse->onClick();
+			}
+			//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
+			//{
+				//[1] If user clicks on the Toolbar
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
+			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+			{
+				isExit = gameBudgetbar->handleClick(x, y);
+			}
+			//}
+	}  while (!isExit);
 	return !isExit;
 }
 
