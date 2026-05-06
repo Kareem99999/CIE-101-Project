@@ -342,6 +342,7 @@ bool Game::go() {
 					gameEggslist[totalcreatedeggs]->draw();
 					totalcreatedeggs++;
 					eggsCounter++;
+					ChickIcon::chickList[i]->Resetfoodeaten();
 				}
 			}
 			for (int i = 0; i < CowIcon::count; i++) {
@@ -358,6 +359,7 @@ bool Game::go() {
 					gameMilklist[totalcreatedmilk]->draw();
 					totalcreatedmilk++;
 					milkCounter++;
+					CowIcon::cowList[i]->Resetfoodeaten();
 				}
 			}
 			if (gameWolf) {
