@@ -2,6 +2,7 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
+#include "../Entities/food.h"
 #include <chrono>
 #include "../Core/GameObject.h"
 
@@ -31,6 +32,12 @@ private:
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
 	FoodArea* gameFoodArea;
+	eggs** gameEggslist = new eggs* [15];
+	int eggsCounter = 0;
+	int totalcreatedeggs = 0;
+	milk** gameMilklist = new milk*[15];
+	int milkCounter = 0;
+	int totalcreatedmilk = 0;
 	Timer* gameTimer;
 	Wolf* gameWolf;
 
@@ -59,10 +66,13 @@ public:
 	void createFarm();
 	void redrawFarm() const;
 	void createWarehouse();
-	void createFoodArea();
+	int getEggcount();
+	int getMilkcount();
+	//void createFoodArea();
 	Farm* getFarm() const;
-	FoodArea* getFoodArea() const;
-
+	//FoodArea* getFoodArea() const;
+	void decreasemilkcount();
+	void decreaseeggscount();
 	bool go();
 	void saving() const;
 	void loading();

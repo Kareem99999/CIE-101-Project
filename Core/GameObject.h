@@ -45,18 +45,22 @@ protected:
 public:
 	Warehouse(Game * r_pGame, point ref, int r_width, int r_height, color fc, color bc);
 	void draw() const override;
+	void onClick();
+	int getWarehouseWidth();
+	int getWarehouseHeight();
+	point getRefPoint();
 };
 
 class FoodArea : public GameObject {
 protected:
-	int FoodAreaWidth = 0;
-	int FoodAreaHeight = 0;
+	static int FoodAreaWidth;
+	static int FoodAreaHeight;
 	int foodcounter = 3;
 public:
-	FoodArea(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc);
+	FoodArea(Game* r_pGame, point ref);
 	void draw() const override;
-	void setFoodAreadim(int width, int height);
-	point getFoodAreaDim();
+	static int getFoodAreaX();
+	static int getFoodAreaY();
 	point getFoodAreaRef();
 	void decreaseFood(int x);
 	int getfoodcounter();
