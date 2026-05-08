@@ -2,6 +2,7 @@
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
 #include "../Entities/Animal.h"
+#include "../Core/GameObject.h"
 #include <iostream>
 using namespace std;
 
@@ -11,6 +12,7 @@ int ChickIcon::count = 0;
 int CowIcon::count = 0;
 Chick** ChickIcon::chickList = nullptr;
 Cow** CowIcon::cowList = nullptr;
+FoodArea** WaterIcon::FoodAreaList = nullptr;
 int BudgetbarIcon::range_min_x = 50;
 int BudgetbarIcon::range_max_x = config.windWidth - 50;
 int BudgetbarIcon::range_min_y = (config.toolBarHeight * 2) + 50;
@@ -129,6 +131,7 @@ void ChickIcon::onClick()
 		count++;
 		//window* pWind = pGame->getWind();
 		//pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+		//pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	}
 }
 
@@ -230,6 +233,10 @@ bool Budgetbar::handleClick(int x, int y)
 
 WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
+	FoodAreaList = new FoodArea * [15];
+	for (int i = 0; i < 15; i++) {
+		FoodAreaList[i] = nullptr;
+	}
 	amount = 0;
 }
 
@@ -253,6 +260,17 @@ void WaterIcon::onClick()
 		pGame->budget -= 20;
 		// increase water amount and print
 		// find this icon instance to access amount (this)
+		point p;
+		std::random_device rd1;
+		std::mt19937 gen1(rd1());
+		std::uniform_int_distribution<int> dist1(range_min_x, (range_max_x - FoodArea::getFoodAreaX()));
+		p.x = dist1(gen1);
+		std::random_device rd2;
+		std::mt19937 gen2(rd2());
+		std::uniform_int_distribution<int> dist2(range_min_y, (range_max_y - FoodArea::getFoodAreaY()));
+		p.y = dist2(gen2);
+		FoodAreaList[amount] = new FoodArea(pGame, p);
+		FoodAreaList[amount]->draw();
 		amount++;
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);

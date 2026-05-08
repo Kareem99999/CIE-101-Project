@@ -1,5 +1,6 @@
 #pragma once
 #include "../Core/Drawable.h"
+#include "../Core/Gameobject.h"
 #include "../Entities/Animal.h"
 #include "../Config/GameConfig.h"
 #include <random>
@@ -86,6 +87,7 @@ class WaterIcon : public BudgetbarIcon
 	int static amount;
 public:
 	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	static FoodArea** FoodAreaList;
 	virtual void onClick();
 	int static waterAmount();
 	void decreaseWater();
