@@ -3,8 +3,11 @@
 
 int main()
 {
-	//Create an object of controller
-	Game game;
+	bool existing = true;
+	while (existing) {
+		//Create an object of controller
+		Game game;
 
-	game.go();
+		existing = game.go();
+	}
 }

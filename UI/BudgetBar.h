@@ -84,8 +84,8 @@ public:
 
 class WaterIcon : public BudgetbarIcon
 {
-	int static amount;
 public:
+	int static amount;
 	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	static FoodArea** FoodAreaList;
 	virtual void onClick();

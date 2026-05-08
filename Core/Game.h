@@ -31,7 +31,6 @@ private:
 	Budgetbar* gameBudgetbar;
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
-	FoodArea* gameFoodArea;
 	eggs** gameEggslist = new eggs* [15];
 	int eggsCounter = 0;
 	int totalcreatedeggs = 0;
@@ -68,9 +67,7 @@ public:
 	void createWarehouse();
 	int getEggcount();
 	int getMilkcount();
-	//void createFoodArea();
 	Farm* getFarm() const;
-	//FoodArea* getFoodArea() const;
 	void decreasemilkcount();
 	void decreaseeggscount();
 	bool go();

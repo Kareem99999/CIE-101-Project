@@ -74,7 +74,7 @@ int  BudgetbarIcon::getRangeMaxY()
 ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
 	chickList = new Chick * [15];
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 15; i++) {
 		chickList[i] = nullptr;
 	}
 }
@@ -82,7 +82,7 @@ ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
 	cowList = new Cow * [15];
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 15; i++) {
 		cowList[i] = nullptr;
 	}
 }
@@ -190,14 +190,27 @@ Budgetbar::~Budgetbar()
 		delete ChickIcon::chickList[i];
 
 	delete[] ChickIcon::chickList;
+
 	for (int i = 0; i < CowIcon::count; i++)
 		delete CowIcon::cowList[i];
 
 	delete[] CowIcon::cowList;
+
 	for (int i = 0; i < BUDGET_ICON_COUNT; i++)
 		delete iconsList[i];
 
 	delete[] iconsList;
+
+	ChickIcon::count = 0;
+	CowIcon::count = 0;
+
+	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
+		if (WaterIcon::FoodAreaList[i]) {
+			delete WaterIcon::FoodAreaList[i];
+		}
+	}
+	delete[] WaterIcon::FoodAreaList;
+	WaterIcon::amount = 0;
 }
 
 void Budgetbar::draw() const

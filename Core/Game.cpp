@@ -62,14 +62,18 @@ long long Timer::remaining() const {
 
 Game::~Game()
 {
+	for (int i = 0; i < eggsCounter; i++) delete gameEggslist[i];
+	delete[] gameEggslist;
+	for (int i = 0; i < milkCounter; i++) delete gameMilklist[i];
+	delete[] gameMilklist;
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete gameFarm;
 	delete gameWarehouse;
-	//delete gameFoodArea;
 	delete gameTimer;
 	delete gameWolf;
-	//delete pWind;
+	pWind->SetWaitClose(false);
+	delete pWind;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
@@ -173,17 +177,6 @@ void Game::createWarehouse(){
 	gameWarehouse->draw();
 }
 
-/*void Game::createFoodArea()
-{
-	point FoodAreaRef;
-	FoodAreaRef.x = config.windWidth / 2;
-	FoodAreaRef.y = config.windHeight / 2;
-	int Height = 50;
-	int width = 50;
-	gameFoodArea = new FoodArea(this, FoodAreaRef); // this is a pointer for the game // food area ref : tells x , y
-	gameFoodArea->draw();
-}*/
-
 void Game::createBudgetbar()
 {
 	point budgetbarUpperleft;
@@ -262,11 +255,6 @@ Farm* Game::getFarm() const
 	return gameFarm;
 }
 
-/*FoodArea* Game::getFoodArea() const
-{
-	return gameFoodArea;
-}*/
-
 void Game::saving() const{
 	ofstream SaveFile("SaveFile.txt");
 	SaveFile << budget << " " << gameTimer->remaining() << "\n";
@@ -317,7 +305,7 @@ bool Game::go() {
 			printMessage(status_message);
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);
-			redrawFarm();	//Get the coordinates of the user click
+			redrawFarm();
 			for (int i = 0; i < totalcreatedeggs; i++) {
 				if (gameEggslist[i]) {
 					gameEggslist[i]->draw();
