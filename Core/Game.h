@@ -13,14 +13,19 @@ class Timer {
 private:
 	TIME start = TIME();
 	TIME end = TIME();
+	TIME pauseStart;
+	std::chrono::milliseconds pausedTime = std::chrono::milliseconds(0);
 	static TIME delay;
 public:
+	bool isPaused = false;
 	Timer(int duration);
 	void setDuration(int Duration);
 	bool check() const;
 	//bool delayed(int duration) const;
 	long long elapsed() const;
 	long long remaining() const;
+	void paused();
+	void resume();
 };
 
 class Game
@@ -37,11 +42,14 @@ private:
 	milk** gameMilklist = new milk*[15];
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
-	Timer* gameTimer;
 	Wolf* gameWolf;
 
 public:
+	Timer* gameTimer;
+	Timer* wolf_delay;
 	int budget = 20000;
+	bool ispaused;
+	bool gameEnded;
 	bool timeToRestart = false;
 	static bool shouldLoad;
 	Game();
@@ -76,6 +84,6 @@ public:
 	void startLoading();
 	void restart();
 
-	window* getWind() const;		//returns a pointer to the graphics window
+	window* getWind() const;		//returns pointer to the graphics window
 };
 

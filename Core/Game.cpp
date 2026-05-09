@@ -5,6 +5,8 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include <iostream>
+using namespace std;
 
 bool Game::shouldLoad = false;
 Game::Game()
@@ -17,6 +19,8 @@ Game::Game()
 	clearStatusBar();
 	createTimer();
 	gameWolf = nullptr;
+	ispaused = false;
+	wolf_delay = new Timer(20 * 1000);
 
 	if (shouldLoad) {
 		shouldLoad = false;
@@ -46,10 +50,18 @@ Timer::Timer(int duration) {
 void Timer::setDuration(int Duration) {
 	start = TIMER::now();
 	end = start + std::chrono::milliseconds(Duration);
+	pausedTime = std::chrono::milliseconds(0);
+	isPaused = false;  // Force reset
 }
 
 bool Timer::check() const {
-	return (TIMER::now() >= end);
+	auto now = TIMER::now();
+	bool expired = (now >= end);
+	if (expired) {
+		auto remaining_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - now).count();
+		cout << "CHECK: expired=true, remaining=" << remaining_ms << "ms, end time=" << end.time_since_epoch().count() << ", now=" << now.time_since_epoch().count() << endl;
+	}
+	return expired;
 }
 
 long long Timer::elapsed() const {
@@ -59,7 +71,19 @@ long long Timer::elapsed() const {
 long long Timer::remaining() const {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count();
 }
-
+void Timer::paused() {
+	if (!isPaused) {
+		isPaused = true;
+		pauseStart = TIMER::now();
+	}
+}
+void Timer::resume() {
+	if (isPaused) {
+		isPaused = false;
+		pausedTime += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
+		end += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
+	}
+}
 Game::~Game()
 {
 	for (int i = 0; i < eggsCounter; i++) delete gameEggslist[i];
@@ -74,6 +98,7 @@ Game::~Game()
 	delete gameWolf;
 	pWind->SetWaitClose(false);
 	delete pWind;
+	delete wolf_delay;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
@@ -153,6 +178,7 @@ void Game::redrawFarm() const
 
 void Game::createWolf()
 {
+	if (gameWolf != nullptr) return;
 	point p;
 	std::random_device rd1;
 	std::mt19937 gen1(rd1());
@@ -275,102 +301,150 @@ void Game::restart() {
 	timeToRestart = true;
 }
 
-bool Game::go() {
+bool Game::go()
+{
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
+	cout << "gameWolf = " << gameWolf << endl;
 	int static level = 1;
 	bool isExit = false;
-	Timer* delay = new Timer(300);
-	Timer* wolf_delay = new Timer(10 * 1000);
-
+	bool pausewindow = false;
+	gameEnded = false;
+	Timer delay(300);
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
 	pWind->DrawString(200, 200, "REAL FILE");
 
 	do
 	{
-		if (level == 1) {
-			if (wolf_delay->check())
-			{
-				createWolf();
+		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
+			pausewindow = false;
+			if (level == 1) {
+				if (wolf_delay->check())
+				{
+					createWolf();
 
-				wolf_delay->setDuration(60 * 1000);
+					wolf_delay->setDuration(60 * 1000);
+				}
+			}
+			if (timeToRestart) { return true; }
+			if (delay.check()) {
+				string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
+				printMessage(status_message);
+				string budget_string = "BUDGET = $" + to_string(budget);
+				printBudget(budget_string);
+				redrawFarm();
+				for (int i = 0; i < totalcreatedeggs; i++) {
+					if (gameEggslist[i]) {
+						gameEggslist[i]->draw();
+					}
+				}
+				for (int i = 0; i < totalcreatedmilk; i++) {
+					if (gameMilklist[i]) {
+						gameMilklist[i]->draw();
+					}
+				}
+				for (int i = 0; i < ChickIcon::count; i++) {
+					ChickIcon::chickList[i]->moveStep();
+					ChickIcon::chickList[i]->ifColl();
+					for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+						if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
+							delete WaterIcon::FoodAreaList[x];
+							WaterIcon::FoodAreaList[x] = nullptr;
+						}
+					}
+					if (ChickIcon::chickList[i]->getFoodeaten() != 0 && ChickIcon::chickList[i]->getFoodeaten() % 2 == 0) {
+						gameEggslist[totalcreatedeggs] = new eggs(this, ChickIcon::chickList[i]->curr_pos, 20, 20);
+						gameEggslist[totalcreatedeggs]->draw();
+						totalcreatedeggs++;
+						eggsCounter++;
+						ChickIcon::chickList[i]->Resetfoodeaten();
+					}
+				}
+				for (int i = 0; i < CowIcon::count; i++) {
+					CowIcon::cowList[i]->moveStep();
+					CowIcon::cowList[i]->ifColl();
+					for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+						if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
+							delete WaterIcon::FoodAreaList[x];
+							WaterIcon::FoodAreaList[x] = nullptr;
+						}
+					}
+					if (CowIcon::cowList[i]->getFoodeaten() != 0 && CowIcon::cowList[i]->getFoodeaten() % 4 == 0) {
+						gameMilklist[totalcreatedmilk] = new milk(this, CowIcon::cowList[i]->curr_pos, 20, 20);
+						gameMilklist[totalcreatedmilk]->draw();
+						totalcreatedmilk++;
+						milkCounter++;
+						CowIcon::cowList[i]->Resetfoodeaten();
+					}
+				}
+				if (gameWolf) {
+					gameWolf->moveStep();
+				}
+				delay.setDuration(300);
 			}
 		}
-		if (timeToRestart) { return true; }
-		if (delay->check()) {
-			string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
-			printMessage(status_message);
-			string budget_string = "BUDGET = $" + to_string(budget);
-			printBudget(budget_string);
-			redrawFarm();
-			for (int i = 0; i < totalcreatedeggs; i++) {
-				if (gameEggslist[i]) {
-					gameEggslist[i]->draw();
-				}
-			}
-			for (int i = 0; i < totalcreatedmilk; i++) {
-				if (gameMilklist[i]) {
-					gameMilklist[i]->draw();
-				}
-			}
-			for (int i = 0; i < ChickIcon::count; i++) {
-				ChickIcon::chickList[i]->moveStep();
-				ChickIcon::chickList[i]->ifColl();
-				for (int x = 0; x < WaterIcon::waterAmount(); x++) {
-					if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
-						delete WaterIcon::FoodAreaList[x];
-						WaterIcon::FoodAreaList[x] = nullptr;
-					}
-				}
-				if (ChickIcon::chickList[i]->getFoodeaten() != 0 && ChickIcon::chickList[i]->getFoodeaten() % 2 == 0) {
-					gameEggslist[totalcreatedeggs] = new eggs(this, ChickIcon::chickList[i]->curr_pos, 20, 20);
-					gameEggslist[totalcreatedeggs]->draw();
-					totalcreatedeggs++;
-					eggsCounter++;
-					ChickIcon::chickList[i]->Resetfoodeaten();
-				}
-			}
-			for (int i = 0; i < CowIcon::count; i++) {
-				CowIcon::cowList[i]->moveStep();
-				CowIcon::cowList[i]->ifColl();
-				for (int x = 0; x < WaterIcon::waterAmount(); x++) {
-					if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
-						delete WaterIcon::FoodAreaList[x];
-						WaterIcon::FoodAreaList[x] = nullptr;
-					}
-				}
-				if (CowIcon::cowList[i]->getFoodeaten() != 0 && CowIcon::cowList[i]->getFoodeaten() % 4 == 0) {
-					gameMilklist[totalcreatedmilk] = new milk(this, CowIcon::cowList[i]->curr_pos, 20, 20);
-					gameMilklist[totalcreatedmilk]->draw();
-					totalcreatedmilk++;
-					milkCounter++;
-					CowIcon::cowList[i]->Resetfoodeaten();
-				}
-			}
-			if (gameWolf) {
-				gameWolf->moveStep();
-			}
-				delay->setDuration(300);
-			}
-			getMouseClick(x, y);
-			if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
-				gameWarehouse->onClick();
-			}
-			//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
-			//{
-				//[1] If user clicks on the Toolbar
-			if (y >= 0 && y < config.toolBarHeight)
+		getMouseClick(x, y);
+		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+			gameWarehouse->onClick();
+		}
+		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
+		//{
+			//[1] If user clicks on the Toolbar
+		if (y >= 0 && y < config.toolBarHeight)
+		{
+			isExit = gameToolbar->handleClick(x, y);
+		}
+		else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+		{
+			isExit = gameBudgetbar->handleClick(x, y);
+		}
+		//}
+		if (ispaused && pausewindow == false)
+		{
+			int centerX = config.windWidth / 2;
+			int centerY = config.windHeight / 2;
+			int width = 350;
+			int height = 120;
+			int left = centerX - width / 2;
+			int top = centerY - height / 2;
+
+			pWind->SetPen(color(50, 50, 50), 1);
+			pWind->SetBrush(color(40, 40, 40));
+			pWind->DrawRectangle(left + 8, top + 8, left + width + 8, top + height + 8, FILLED, 15, 15);
+
+
+			pWind->SetPen(color(100, 100, 200), 3);
+			pWind->SetBrush(color(30, 30, 60));
+			pWind->DrawRectangle(left, top, left + width, top + height, FILLED, 15, 15);
+
+			pWind->SetFont(40, BOLD, BY_NAME, "Arial");
+			pWind->SetPen(color(255, 100, 100), 1);
+			pWind->DrawString(centerX - 80, centerY - 15, "PAUSED");
+			pausewindow = true;
+		}
+		if (gameTimer->remaining() <= 0 && !gameEnded && budget < 50000)
+		{
+			gameEnded = true;
 			{
-				isExit = gameToolbar->handleClick(x, y);
+				int centerX = config.windWidth / 2;
+				int centerY = config.windHeight / 2;
+
+				pWind->SetPen(RED, 3);
+				pWind->SetBrush(DARKGRAY);
+				pWind->DrawRectangle(centerX - 150, centerY - 60, centerX + 150, centerY + 60, FILLED);
+
+				pWind->SetFont(40, BOLD, BY_NAME, "Arial");
+				pWind->SetPen(RED, 1);
+				pWind->DrawString(centerX - 100, centerY - 20, "GAME OVER");
+				int clickX, clickY;
+				getMouseClick(clickX, clickY);
+
 			}
-			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
-			{
-				isExit = gameBudgetbar->handleClick(x, y);
-			}
-			//}
-	}  while (!isExit);
-	return !isExit;
-}
+		}
+	} while (!isExit);
+
+		return !isExit;
+	}
 
 
