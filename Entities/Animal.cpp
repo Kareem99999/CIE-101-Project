@@ -64,9 +64,19 @@ int Cow::getFoodeaten()
 	return foodeaten;
 }
 
+void Cow::setFoodeaten(int value)
+{
+	foodeaten = value;
+}
+
 int Chick::getFoodeaten()
 {
 	return foodeaten;
+}
+
+void Chick::setFoodeaten(int value)
+{
+	foodeaten = value;
 }
 
 void Cow::Resetfoodeaten()

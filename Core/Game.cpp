@@ -6,33 +6,33 @@
 #include <chrono>
 #include <fstream>
 
+bool Game::shouldLoad = false;
 Game::Game()
 {
-
-
-	//1 - Create the main window
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
-
-	//2 - create and draw the toolbar
 	createToolbar();
 	createBudgetbar();
-	//3 - create and draw the backgroundPlayingArea
 	createWarehouse();
 	createFarm();
-	//createFoodArea();
-	//4- Create the Plane
-	//TODO: Add code to create and draw the Plane
-
-	//5- Create the Bullet
-	//TODO: Add code to create and draw the Bullet
-
-	//6- Create the enemies
-	//TODO: Add code to create and draw enemies in random places
-
-	//7- Create and clear the status bar
 	clearStatusBar();
 	createTimer();
 	gameWolf = nullptr;
+
+	if (shouldLoad) {
+		shouldLoad = false;
+		ifstream SaveFile("SaveFile.txt");
+		if (SaveFile) {
+			int currentTime, animalCount;
+			SaveFile >> budget >> currentTime >> animalCount;
+			gameTimer->setDuration(currentTime);
+			BudgetbarIcon::setAnimalCounter(animalCount);
+			for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
+				gameBudgetbar->getIcon(i)->Loading(SaveFile);
+			}
+		}
+		SaveFile.close();
+		printMessage("Game Loaded!");
+	}
 }
 
 
@@ -266,20 +266,9 @@ void Game::saving() const{
 	printMessage("Game Saved!");
 }
 
-void Game::loading() {
-	ifstream SaveFile("SaveFile.txt");
-	if (SaveFile) {
-		int currentTime, animalCount;
-		SaveFile >> budget >> currentTime >> animalCount;
-		gameTimer->setDuration(currentTime);
-		BudgetbarIcon::setAnimalCounter(animalCount);
-		//for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
-		//	gameBudgetbar->getIcon(i)->Loading(SaveFile);
-		//	SaveFile >> "\n";
-		//}
-	}
-	SaveFile.close();
-	printMessage("Game Loaded!");
+void Game::startLoading() {
+	shouldLoad = true;
+	
 }
 
 void Game::restart() {

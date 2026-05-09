@@ -168,7 +168,7 @@ void CowIcon::onClick()
 
 void ChickIcon::Saving(ofstream& saveFile) const
 {
-	//saveFile << "Chicks: " << count;
+	saveFile << count << " ";
 	for (int i = 0; i < count; i++) {
 		if (chickList[i]) {
 			saveFile << chickList[i]->curr_pos.x << " " << chickList[i]->curr_pos.y << " " << chickList[i]->curr_vel.x << " " << chickList[i]->curr_vel.y << " " << chickList[i]->getFoodeaten() << " ";
@@ -176,18 +176,37 @@ void ChickIcon::Saving(ofstream& saveFile) const
 	}
 }
 
-//void ChickIcon::Loading(ifstream& loadFile) const
-//{
-//	if(chickList)
-//}
+void ChickIcon::Loading(ifstream& loadFile) const
+{
+	loadFile >> count;
+	for (int i = 0; i < count; i++) {
+		int x, y, velx, vely, food;
+		loadFile >> x >> y >> velx >> vely >> food;
+		chickList[i] = new Chick(pGame, {x, y}, Chick::getChickSizeInX(), Chick::getChickSizeInY(), "images\\chick.jpg");
+		chickList[i]->curr_vel = {velx, vely};
+		chickList[i]->setFoodeaten(food);
+	}
+}
 
 void CowIcon::Saving(ofstream& saveFile) const
 {
-	//saveFile << "Cows: " << count;
+	saveFile << count << " ";
 	for (int i = 0; i < count; i++) {
 		if (cowList[i]) {
 			saveFile << cowList[i]->curr_pos.x << " " << cowList[i]->curr_pos.y << " " << cowList[i]->curr_vel.x << " " << cowList[i]->curr_vel.y << " " << cowList[i]->getFoodeaten() << " ";
 		}
+	}
+}
+
+void CowIcon::Loading(ifstream& loadFile) const
+{
+	loadFile >> count;
+	for (int i = 0; i < count; i++) {
+		int x, y, velx, vely, food;
+		loadFile >> x >> y >> velx >> vely >> food;
+		cowList[i] = new Cow(pGame, {x, y}, Cow::getCowSizeInX(), Cow::getCowSizeInY(), "images\\cow.jpg");
+		cowList[i]->curr_vel = {velx, vely};
+		cowList[i]->setFoodeaten(food);
 	}
 }
 
@@ -292,11 +311,23 @@ WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 
 void WaterIcon::Saving(ofstream& saveFile) const
 {
-	//saveFile << "Water: " << amount << endl;
+	saveFile << amount << " ";
 	for (int i = 0; i < amount; i++) {
 		if (FoodAreaList[i]) {
-			saveFile << FoodAreaList[i]->getFoodAreaRef().x << " " << FoodAreaList[i]->getFoodAreaRef().y << " " << FoodAreaList[i]->getfoodcounter() << endl;
+			saveFile << FoodAreaList[i]->getFoodAreaRef().x << " " << FoodAreaList[i]->getFoodAreaRef().y << " " << FoodAreaList[i]->getfoodcounter() << " ";
 		}
+	}
+}
+
+void WaterIcon::Loading(ifstream& loadFile) const
+{
+	loadFile >> amount;
+	for (int i = 0; i < amount; i++) {
+		int x, y, food;
+		loadFile >> x >> y >> food;
+		FoodAreaList[i] = new FoodArea(pGame, {x, y});
+		FoodAreaList[i]->decreaseFood(3 - food);
+		FoodAreaList[i]->draw();
 	}
 }
 

@@ -32,6 +32,7 @@ public:
 	int static getChickSizeInY();
 	void ifColl();
 	int getFoodeaten();
+	void setFoodeaten(int value);
 	void Resetfoodeaten();
 	virtual void moveStep();
 	bool* PrevCollwithFoodArea = new bool[15];
@@ -52,6 +53,7 @@ public:
 	int static getCowSizeInY();
 	virtual void moveStep();
 	int getFoodeaten();
+	void setFoodeaten(int value);
 	void Resetfoodeaten();
 	void ifColl();
 	bool* PrevCollwithFoodArea = new bool[15];

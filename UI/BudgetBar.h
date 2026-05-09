@@ -33,7 +33,7 @@ public:
 	void static setRangeMinY(int valueMinY);
 	void static setRangeMaxY(int valueMaxY);
 	virtual void Saving(ofstream& saveFile) const = 0;
-	//virtual void Loading(ifstream& loadFile) const = 0;
+	virtual void Loading(ifstream& loadFile) const = 0;
 };
 
 class ChickIcon : public BudgetbarIcon
@@ -44,7 +44,7 @@ public:
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 	virtual void Saving(ofstream& saveFile) const;
-	//virtual void Loading(ifstream& loadFile) const;
+	virtual void Loading(ifstream& loadFile) const;
 };
 
 class CowIcon : public BudgetbarIcon
@@ -55,6 +55,7 @@ public:
 	CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 	virtual void Saving(ofstream& saveFile) const;
+	virtual void Loading(ifstream& loadFile) const;
 };
 
 // TO DO: The rest of icons in the toolbar
@@ -99,4 +100,5 @@ public:
 	int static waterAmount();
 	void decreaseWater();
 	virtual void Saving(ofstream& saveFile) const;
+	virtual void Loading(ifstream& loadFile) const;
 };

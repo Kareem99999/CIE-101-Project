@@ -43,6 +43,7 @@ private:
 public:
 	int budget = 20000;
 	bool timeToRestart = false;
+	static bool shouldLoad;
 	Game();
 	~Game();
 
@@ -72,7 +73,7 @@ public:
 	void decreaseeggscount();
 	bool go();
 	void saving() const;
-	void loading();
+	void startLoading();
 	void restart();
 
 	window* getWind() const;		//returns a pointer to the graphics window
