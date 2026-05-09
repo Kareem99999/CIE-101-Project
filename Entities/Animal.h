@@ -6,6 +6,7 @@ class Animal :public Drawable
 {
 private:
 	string image_path;
+	int foodeaten = 0;
 	// Timer variables for animals products
 public:
 	point curr_pos;
@@ -15,6 +16,7 @@ public:
 	virtual void draw() const override;
 	virtual void velocity() = 0;
 	virtual void moveStep() = 0;
+	virtual int getremainingfood() const  = 0;
 	//void produce(int duration);
 };
 
@@ -34,6 +36,7 @@ public:
 	int getFoodeaten();
 	void setFoodeaten(int value);
 	void Resetfoodeaten();
+	int getremainingfood() const override ;
 	virtual void moveStep();
 	bool* PrevCollwithFoodArea = new bool[15];
 	bool* CurrCollwithFoodArea = new bool[15];
@@ -55,6 +58,7 @@ public:
 	int getFoodeaten();
 	void setFoodeaten(int value);
 	void Resetfoodeaten();
+	int getremainingfood() const override ;
 	void ifColl();
 	bool* PrevCollwithFoodArea = new bool[15];
 	bool* CurrCollwithFoodArea = new bool[15];
@@ -70,4 +74,5 @@ public:
 	int static getWolfSizeInX();
 	int static getWolfSizeInY();
 	virtual void moveStep();
+	int getremainingfood() const override ;
 };

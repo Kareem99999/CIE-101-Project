@@ -19,6 +19,7 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 
 }
 
+
 void Chick::ifColl() {
 	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
 		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
@@ -94,6 +95,28 @@ void Animal::draw() const
 	//draw image of this object
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+	int remaining = getremainingfood();
+	if (remaining > 0) {
+		int boxWidth = 30;
+		int boxHeight = 25;
+		int boxX = RefPoint.x + (width / 2) - (boxWidth / 2);
+		int boxY = RefPoint.y - boxHeight - 5;
+
+		// Draw box background
+		pWind->SetPen(BLACK, 1);
+		pWind->SetBrush(LIGHTGRAY);
+		pWind->DrawRectangle(boxX, boxY, boxX + boxWidth, boxY + boxHeight, FILLED);
+
+		// Draw border
+		pWind->SetPen(BLACK, 1);
+		pWind->SetBrush(TRANSPARENT);
+		pWind->DrawRectangle(boxX, boxY, boxX + boxWidth, boxY + boxHeight, FRAME);
+
+		// Draw the number
+		pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+		pWind->SetPen(BLACK, 1);
+		pWind->DrawString(boxX + 8, boxY + 4, to_string(remaining));
+	}
 }
 
 string Animal::getImagePath() const
@@ -135,7 +158,11 @@ int Chick::getChickSizeInY()
 {
 	return chickDimensions.y;
 }
-
+int Chick::getremainingfood() const {
+	int needed = 2;
+	if (this->foodeaten == 0) return needed;
+	return needed - this->foodeaten;
+}
 void Chick::moveStep()
 {
 	window* pWind = pGame->getWind();
@@ -143,6 +170,7 @@ void Chick::moveStep()
 	RefPoint.y += curr_vel.y;
 	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { chickDimensions.x, chickDimensions.y }, 9, 7);
 	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
+	draw();
 }
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
@@ -178,12 +206,19 @@ void Cow::moveStep()
 	RefPoint.y += curr_vel.y;
 	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
 	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
+	draw();
 
 }
-
+int Cow::getremainingfood()const {
+	int needed = 4;
+	if (this->foodeaten == 0) return needed;
+	return needed - this->foodeaten;
+}
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: Animal(r_pGame, r_point, r_width, r_height, img_path)
-{}
+{
+	cout << "wolf contructor";
+}
 
 void Wolf::velocity()
 {
@@ -210,4 +245,7 @@ void Wolf::moveStep()
 	RefPoint.y += curr_vel.y;
 	pGame->getFarm()->keepInFarm(RefPoint, curr_vel, { wolfDimensions.x, wolfDimensions.y }, 6, 4);
 	pWind->DrawImage(getImagePath(), RefPoint.x, RefPoint.y, width, height);
+}
+int Wolf::getremainingfood() const {
+	return -1;
 }
