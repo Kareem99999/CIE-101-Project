@@ -4,6 +4,7 @@
 #include "../Entities/Animal.h"
 #include "../Core/GameObject.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 int WaterIcon::amount = 0;
@@ -32,6 +33,11 @@ void BudgetbarIcon::draw() const
 int BudgetbarIcon::getAnimalCounter()
 {
 	return AnimalsCounter;
+}
+
+void BudgetbarIcon::setAnimalCounter(int value)
+{
+	AnimalsCounter = value;
 }
 
 void BudgetbarIcon::increaseAnimals()
@@ -160,6 +166,30 @@ void CowIcon::onClick()
 	}
 }
 
+void ChickIcon::Saving(ofstream& saveFile) const
+{
+	//saveFile << "Chicks: " << count;
+	for (int i = 0; i < count; i++) {
+		if (chickList[i]) {
+			saveFile << chickList[i]->curr_pos.x << " " << chickList[i]->curr_pos.y << " " << chickList[i]->curr_vel.x << " " << chickList[i]->curr_vel.y << " " << chickList[i]->getFoodeaten() << " ";
+		}
+	}
+}
+
+//void ChickIcon::Loading(ifstream& loadFile) const
+//{
+//	if(chickList)
+//}
+
+void CowIcon::Saving(ofstream& saveFile) const
+{
+	//saveFile << "Cows: " << count;
+	for (int i = 0; i < count; i++) {
+		if (cowList[i]) {
+			saveFile << cowList[i]->curr_pos.x << " " << cowList[i]->curr_pos.y << " " << cowList[i]->curr_vel.x << " " << cowList[i]->curr_vel.y << " " << cowList[i]->getFoodeaten() << " ";
+		}
+	}
+}
 
 Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : Drawable(r_pGame, r_point, r_width, r_height)
 {
@@ -222,6 +252,13 @@ void Budgetbar::draw() const
 	pWind->DrawLine(0, 2*config.toolBarHeight, pWind->GetWidth(), 2*config.toolBarHeight);
 }
 
+BudgetbarIcon* Budgetbar::getIcon(int iconIndex) const
+{
+	if (iconIndex < 0 || iconIndex >= BUDGET_ICON_COUNT)
+		return nullptr;	//invalid index
+	return iconsList[iconIndex];
+}
+
 bool Budgetbar::handleClick(int x, int y)
 {
 	if (x > BUDGET_ICON_COUNT * config.iconWidth)	//click outside toolbar boundaries
@@ -251,6 +288,16 @@ WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 		FoodAreaList[i] = nullptr;
 	}
 	amount = 0;
+}
+
+void WaterIcon::Saving(ofstream& saveFile) const
+{
+	//saveFile << "Water: " << amount << endl;
+	for (int i = 0; i < amount; i++) {
+		if (FoodAreaList[i]) {
+			saveFile << FoodAreaList[i]->getFoodAreaRef().x << " " << FoodAreaList[i]->getFoodAreaRef().y << " " << FoodAreaList[i]->getfoodcounter() << endl;
+		}
+	}
 }
 
 int WaterIcon::waterAmount()

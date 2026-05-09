@@ -257,7 +257,11 @@ Farm* Game::getFarm() const
 
 void Game::saving() const{
 	ofstream SaveFile("SaveFile.txt");
-	SaveFile << budget << " " << gameTimer->remaining() << "\n";
+	SaveFile << budget << " " << gameTimer->remaining() << " " << BudgetbarIcon::getAnimalCounter() << "\n";
+	for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
+		gameBudgetbar->getIcon(i)->Saving(SaveFile);
+		SaveFile << "\n";
+	}
 	SaveFile.close();
 	printMessage("Game Saved!");
 }
@@ -265,9 +269,14 @@ void Game::saving() const{
 void Game::loading() {
 	ifstream SaveFile("SaveFile.txt");
 	if (SaveFile) {
-		int currentTime;
-		SaveFile >> budget >> currentTime;
+		int currentTime, animalCount;
+		SaveFile >> budget >> currentTime >> animalCount;
 		gameTimer->setDuration(currentTime);
+		BudgetbarIcon::setAnimalCounter(animalCount);
+		//for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
+		//	gameBudgetbar->getIcon(i)->Loading(SaveFile);
+		//	SaveFile >> "\n";
+		//}
 	}
 	SaveFile.close();
 	printMessage("Game Loaded!");
