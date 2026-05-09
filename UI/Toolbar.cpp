@@ -1,6 +1,8 @@
 #include "Toolbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include<iostream>
+using namespace std;
 
 ToolbarIcon::ToolbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
@@ -25,7 +27,14 @@ StartIcon::StartIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 }
 void StartIcon::onClick()
 {
-	//TO DO: add code for starting the game here
+	if (pGame->ispaused)
+	{
+		pGame->ispaused = false;
+		pGame->gameTimer->resume();
+		pGame->wolf_delay->resume();
+		cout << "Game is resumed" << endl;
+	}
+	
 }
 SaveIcon::SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
@@ -47,7 +56,13 @@ PauseIcon::PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 }
 void PauseIcon::onClick()
 {
-	//TO DO: add code for pausing the game here
+	if (!pGame->ispaused) {
+		cout << "Game is paused" << endl;
+		pGame->ispaused = true;
+		pGame->gameTimer->paused();
+		pGame->wolf_delay->paused();
+	}
+	
 }
 ExitIcon::ExitIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {}
@@ -92,7 +107,7 @@ Toolbar::~Toolbar()
 {
 	for (int i = 0; i < ICON_COUNT; i++)
 		delete iconsList[i];
-	delete iconsList;
+	delete []iconsList;
 }
 
 void Toolbar::draw() const
