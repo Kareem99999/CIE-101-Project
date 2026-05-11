@@ -9,6 +9,8 @@
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
 
+static int lvl = 1;	// Global variable to keep track of the current level of the game
+
 class Timer {
 private:
 	TIME start = TIME();
@@ -43,11 +45,17 @@ private:
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
 	Wolf* gameWolf;
+	// Level variable is global
 
 public:
+	// Level ^^^^^^^^^^
+	void lvlUp(Game* pGame);   // Level control function
+	int getlvl() const;        // Reurns the current level of the game
+
 	Timer* gameTimer;
 	Timer* wolf_delay;
-	int budget = 20000;
+	// Timer shi ^^^^^
+	int budget = 2000;
 	bool ispaused;
 	bool gameEnded;
 	bool timeToRestart = false;

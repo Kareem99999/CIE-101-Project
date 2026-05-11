@@ -8,6 +8,25 @@
 #include <iostream>
 using namespace std;
 
+// Level up function to increase the level and set new target budget
+void Game::lvlUp(Game* pGame) {
+	int targetBudget = pGame->budget + 1000;
+	if (pGame->budget >= targetBudget) {
+		lvl++;
+		pGame->printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
+		if (pGame->budget <= 10000) {
+			targetBudget += 1000;
+		}
+		else if (pGame->budget <= 50000) {
+			targetBudget += 5000;
+		}
+		else {
+			targetBudget += 10000;
+		}
+	}
+}
+
+
 bool Game::shouldLoad = false;
 Game::Game()
 {
@@ -306,7 +325,6 @@ bool Game::go()
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	cout << "gameWolf = " << gameWolf << endl;
-	int static level = 1;
 	bool isExit = false;
 	bool pausewindow = false;
 	gameEnded = false;
@@ -319,7 +337,7 @@ bool Game::go()
 	{
 		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
 			pausewindow = false;
-			if (level == 1) {
+			if (lvl == 1) {
 				if (wolf_delay->check())
 				{
 					createWolf();
@@ -329,7 +347,7 @@ bool Game::go()
 			}
 			if (timeToRestart) { return true; }
 			if (delay.check()) {
-				string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: , Current Animal Count: " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount: " + to_string(WaterIcon::waterAmount());
+				string status_message = "Level: " + to_string(lvl) + ", Timer:" + modifyTimerToStandard() + ", Goal : , Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
 				printMessage(status_message);
 				string budget_string = "BUDGET = $" + to_string(budget);
 				printBudget(budget_string);

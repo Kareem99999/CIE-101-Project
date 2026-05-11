@@ -166,6 +166,7 @@
     <ClCompile Include="Core\Game.cpp" />
     <ClCompile Include="Core\GameObject.cpp" />
     <ClCompile Include="Entities\Animal.cpp" />
+    <ClCompile Include="Entities\food.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="UI\BudgetBar.cpp" />
     <ClCompile Include="UI\Toolbar.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="Core\Game.h" />
     <ClInclude Include="Core\GameObject.h" />
     <ClInclude Include="Entities\Animal.h" />
+    <ClInclude Include="Entities\food.h" />
     <ClInclude Include="UI\BudgetBar.h" />
     <ClInclude Include="UI\Toolbar.h" />
   </ItemGroup>
