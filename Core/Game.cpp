@@ -10,9 +10,9 @@ using namespace std;
 
 // Level up function to increase the level and set new target budget
 void Game::lvlUp(Game* pGame) {
-	int targetBudget = pGame->budget + 1000;
 	if (pGame->budget >= targetBudget) {
 		lvl++;
+		targetBudget = pGame->budget + 1000;
 		pGame->printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
 		if (pGame->budget <= 10000) {
 			targetBudget += 1000;
@@ -24,6 +24,9 @@ void Game::lvlUp(Game* pGame) {
 			targetBudget += 10000;
 		}
 	}
+}
+int Game::getTarget() const {
+	return targetBudget;
 }
 
 
@@ -347,7 +350,8 @@ bool Game::go()
 			}
 			if (timeToRestart) { return true; }
 			if (delay.check()) {
-				string status_message = "Level: " + to_string(lvl) + ", Timer:" + modifyTimerToStandard() + ", Goal : , Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+				string status_message = "Level: " + to_string(lvl) + ", Timer:" + modifyTimerToStandard() + ", Goal : " +  to_string(Game::getTarget()) +
+					"$, Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
 				printMessage(status_message);
 				string budget_string = "BUDGET = $" + to_string(budget);
 				printBudget(budget_string);
