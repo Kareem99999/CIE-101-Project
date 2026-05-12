@@ -9,15 +9,19 @@
 using namespace std;
 
 // Level up function to increase the level and set new target budget
-void Game::lvlUp(Game* pGame) {
-	if (pGame->budget >= targetBudget) {
+void Game::lvlUp() {
+	if (budget >= targetBudget) {
 		lvl++;
-		targetBudget = pGame->budget + 1000;
-		pGame->printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
-		if (pGame->budget <= 10000) {
+		restart();
+		targetBudget = budget + 1000;
+		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
+		if (budget >= 1000) {
 			targetBudget += 1000;
 		}
-		else if (pGame->budget <= 50000) {
+		else if (budget >= 10000) {
+			targetBudget += 2000;
+		}
+		else if (budget >= 50000) {
 			targetBudget += 5000;
 		}
 		else {
@@ -338,6 +342,7 @@ bool Game::go()
 
 	do
 	{
+		lvlUp();
 		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
 			pausewindow = false;
 			if (lvl == 1) {

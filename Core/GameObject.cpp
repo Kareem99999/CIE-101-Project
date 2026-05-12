@@ -4,7 +4,7 @@
 #include <random>
 #include <iostream>
 
-int Farm::margin = 10;
+int Farm::margin = 30;
 int Farm::FarmWidth = 10;
 int Farm::FarmHeight = 10;
 int FoodArea::FoodAreaWidth = 50;

@@ -49,15 +49,15 @@ private:
 
 public:
 	// Level ^^^^^^^^^^
-	void lvlUp(Game* pGame);   // Level control function
+	void lvlUp();   // Level control function
 	//int getlvl() const;        // Reurns the current level of the game
 	int getTarget() const;
 
 	Timer* gameTimer;
 	Timer* wolf_delay;
 	// Timer shi ^^^^^
-	int budget = 2000;
-	int targetBudget = budget + 1000;
+	int budget = 2900;
+	int targetBudget = budget+100;
 	bool ispaused;
 	bool gameEnded;
 	bool timeToRestart = false;

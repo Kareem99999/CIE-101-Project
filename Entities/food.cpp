@@ -69,6 +69,7 @@ void eggs::sell()
 	{
 		amount--;
 		pGame->budget += (sellprice);
+		pGame->lvlUp();
 	}
 }
 
@@ -103,6 +104,7 @@ void milk::sell()
 	{
 		amount--;
 		pGame->budget += sellprice;
+		pGame->lvlUp();
 	}
 }
 // to do see wtf is the addBugdet function and if not there do it
