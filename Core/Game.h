@@ -9,8 +9,6 @@
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
 
-static int lvl = 1;	// Global variable to keep track of the current level of the game
-
 class Timer {
 private:
 	TIME start = TIME();
@@ -26,6 +24,7 @@ public:
 	//bool delayed(int duration) const;
 	long long elapsed() const;
 	long long remaining() const;
+	int remainingInSeconds() const;
 	void paused();
 	void resume();
 };
@@ -38,26 +37,20 @@ private:
 	Budgetbar* gameBudgetbar;
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
-	eggs** gameEggslist = new eggs* [15];
+	eggs** gameEggslist = new eggs* [100];
 	int eggsCounter = 0;
 	int totalcreatedeggs = 0;
-	milk** gameMilklist = new milk*[15];
+	milk** gameMilklist = new milk*[100];
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
 	Wolf* gameWolf;
-	// Level variable is global
+	int static level;
 
 public:
-	// Level ^^^^^^^^^^
-	void lvlUp();   // Level control function
-	//int getlvl() const;        // Reurns the current level of the game
-	int getTarget() const;
-
 	Timer* gameTimer;
 	Timer* wolf_delay;
-	// Timer shi ^^^^^
-	int budget = 2900;
-	int targetBudget = budget+100;
+	int budget = 2000;
+	int targetBudget = budget + 1000;
 	bool ispaused;
 	bool gameEnded;
 	bool timeToRestart = false;
@@ -67,11 +60,12 @@ public:
 
 	clicktype getMouseClick(int& x, int& y) const; //Get coordinate where user clicks and returns click type (left/right)
 	string getSrting() const;	 //Returns a string entered by the user
-
-
+	void lvlUp();
+	int getTarget();
 	window* CreateWind(int, int, int, int) const; //creates the game window
 	void createToolbar();
 	void createBudgetbar();
+	Budgetbar* getBudgetbar() const;
 	void clearBudget() const;
 	void createTimer();
 	void createWolf();
@@ -86,6 +80,8 @@ public:
 	void createWarehouse();
 	int getEggcount();
 	int getMilkcount();
+	void changeEggcount();
+	void changeMilkcount();
 	Farm* getFarm() const;
 	void decreasemilkcount();
 	void decreaseeggscount();

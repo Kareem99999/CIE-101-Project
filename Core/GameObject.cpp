@@ -104,8 +104,8 @@ void Warehouse::onClick() {
 	WarehouseWind->DrawImage("images\\MILK.jpg", 0.58 * config.windWidth, 0.2 * config.windHeight, 0.25 * config.windWidth, 0.25 * config.windHeight);
 	WarehouseWind->SetPen(BLACK, 4);
 	WarehouseWind->SetFont(24, BOLD, BY_NAME, "Arial");
-	WarehouseWind->DrawString(.17 * config.windWidth, 0.55 * config.windHeight, "Eggs price: 100$");
-	WarehouseWind->DrawString(.58 * config.windWidth, 0.55 * config.windHeight, "Milk price: 200$");
+	WarehouseWind->DrawString(.17 * config.windWidth, 0.55 * config.windHeight, "Eggs price: 50$");
+	WarehouseWind->DrawString(.58 * config.windWidth, 0.55 * config.windHeight, "Milk price: 500$");
 	WarehouseWind->SetBrush(PURPLE);
 	WarehouseWind->DrawRectangle(.17 * config.windWidth, 0.8 * config.windHeight, .42 * config.windWidth, .85 * config.windHeight);
 	WarehouseWind->DrawRectangle(.58 * config.windWidth, 0.8 * config.windHeight, .83 * config.windWidth, .85 * config.windHeight);
@@ -121,7 +121,7 @@ void Warehouse::onClick() {
 		WarehouseWind->GetMouseClick(x, y);
 		if (x >= .17 * config.windWidth && x <= .42 * config.windWidth && y >= 0.8 * config.windHeight && y <= 0.85 * config.windHeight) {
 			if (pGame->getEggcount() > 0) {
-				pGame->budget += 100;
+				pGame->budget += eggs::getsellPrice();
 				pGame->decreaseeggscount();
 				WarehouseWind->SetBrush(config.bkGrndColor);
 				WarehouseWind->SetPen(config.bkGrndColor, 1);
@@ -130,7 +130,7 @@ void Warehouse::onClick() {
 		}
 		else if (x >= .58 * config.windWidth && x <= .83 * config.windWidth && y >= 0.8 * config.windHeight && y <= 0.85 * config.windHeight) {
 			if (pGame->getMilkcount() > 0) {
-				pGame->budget += 200;
+				pGame->budget += milk::getsellPrice();
 				pGame->decreasemilkcount();
 				WarehouseWind->SetBrush(config.bkGrndColor);
 				WarehouseWind->SetPen(config.bkGrndColor, 1);
