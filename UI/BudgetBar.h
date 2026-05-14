@@ -20,6 +20,7 @@ public:
 	string image_path;
 	BudgetbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void draw() const override;
+	virtual void setIconProperties() = 0;
 	virtual void onClick() = 0;   //The action that should be taken when this icon is clicked
 	int static  getAnimalCounter();
 	void static setAnimalCounter(int value);
@@ -41,8 +42,10 @@ class ChickIcon : public BudgetbarIcon
 public:
 	static Chick** chickList; //an array of Chick pointers
 	static int count;
+	static int cost;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
+	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;
 	virtual void Loading(ifstream& loadFile) const;
 };
@@ -52,8 +55,10 @@ class CowIcon : public BudgetbarIcon
 public:	
 	static Cow** cowList;
 	static int count;
+	static int cost;
 	CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
+	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;
 	virtual void Loading(ifstream& loadFile) const;
 };
@@ -93,8 +98,10 @@ public:
 class WaterIcon : public BudgetbarIcon
 {
 public:
-	int static amount;
+	static int amount;
+	static int cost;
 	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void setIconProperties() override;
 	static FoodArea** FoodAreaList;
 	virtual void onClick();
 	int static waterAmount();
