@@ -35,6 +35,9 @@ public:
 	void ifColl();
 	int getFoodeaten();
 	void setFoodeaten(int value);
+	bool getPrevColl() const;
+	bool getCurrColl() const;
+	void setColl(bool prev, bool curr);
 	void Resetfoodeaten();
 	int getremainingfood() const override ;
 	virtual void moveStep();
@@ -57,6 +60,9 @@ public:
 	virtual void moveStep();
 	int getFoodeaten();
 	void setFoodeaten(int value);
+	bool getPrevColl() const;
+	bool getCurrColl() const;
+	void setColl(bool prev, bool curr);
 	void Resetfoodeaten();
 	int getremainingfood() const override ;
 	void ifColl();

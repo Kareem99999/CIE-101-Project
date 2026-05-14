@@ -7,13 +7,16 @@
 #include <fstream>
 using namespace std;
 
-int WaterIcon::amount = 0;
 int BudgetbarIcon::AnimalsCounter = 0;
 int ChickIcon::count = 0;
 int CowIcon::count = 0;
+int ChickIcon::cost = 100;
+int CowIcon::cost = 1000;
+int WaterIcon::cost = 20;
 Chick** ChickIcon::chickList = nullptr;
 Cow** CowIcon::cowList = nullptr;
 FoodArea** WaterIcon::FoodAreaList = nullptr;
+int WaterIcon::amount = 0;
 int BudgetbarIcon::range_min_x = 50;
 int BudgetbarIcon::range_max_x = config.windWidth - 50;
 int BudgetbarIcon::range_min_y = (config.toolBarHeight * 2) + 50;
@@ -85,12 +88,30 @@ ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 	}
 }
 
+void ChickIcon::setIconProperties()
+{
+	window* pWind = pGame->getWind();
+	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+	pWind->SetPen(BLACK, 1);
+	pWind->DrawString(RefPoint.x, RefPoint.y + (config.toolBarHeight - 15), "$" + to_string(cost));
+	pWind->DrawString(RefPoint.x + config.iconWidth - 10, RefPoint.y, to_string(count));
+}
+
 CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
 	cowList = new Cow * [15];
 	for (int i = 0; i < 15; i++) {
 		cowList[i] = nullptr;
 	}
+}
+
+void CowIcon::setIconProperties()
+{
+	window* pWind = pGame->getWind();
+	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+	pWind->SetPen(BLACK, 1);
+	pWind->DrawString(RefPoint.x, RefPoint.y + (config.toolBarHeight - 15), "$" + to_string(cost));
+	pWind->DrawString(RefPoint.x + config.iconWidth - 10, RefPoint.y, to_string(count));
 }
 
 
@@ -104,8 +125,8 @@ void ChickIcon::onClick()
 	*/
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
 	cout << "Icon Chick Clicked" << endl;
-	if (pGame->budget > 100) {
-		pGame->budget -= 100;
+	if (pGame->budget > cost) {
+		pGame->budget -= cost;
 		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
@@ -144,8 +165,8 @@ void ChickIcon::onClick()
 void CowIcon::onClick()
 {
 	cout << "Icon Cow Clicked" << endl;
-	if (pGame->budget > 1000) {
-		pGame->budget = pGame->budget - 1000;
+	if (pGame->budget > cost) {
+		pGame->budget = pGame->budget - cost;
 		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
@@ -168,45 +189,51 @@ void CowIcon::onClick()
 
 void ChickIcon::Saving(ofstream& saveFile) const
 {
-	saveFile << count << " ";
+	saveFile << "CHICKS " << count << "\n";
 	for (int i = 0; i < count; i++) {
 		if (chickList[i]) {
-			saveFile << chickList[i]->curr_pos.x << " " << chickList[i]->curr_pos.y << " " << chickList[i]->curr_vel.x << " " << chickList[i]->curr_vel.y << " " << chickList[i]->getFoodeaten() << " ";
+			saveFile << chickList[i]->curr_pos.x << " " << chickList[i]->curr_pos.y << " " << chickList[i]->curr_vel.x << " " << chickList[i]->curr_vel.y << " " << chickList[i]->getFoodeaten() << " " << chickList[i]->getPrevColl() << " " << chickList[i]->getCurrColl() << "\n";
 		}
 	}
 }
 
 void ChickIcon::Loading(ifstream& loadFile) const
 {
-	loadFile >> count;
+	string key;
+	loadFile >> key >> count;
 	for (int i = 0; i < count; i++) {
 		int x, y, velx, vely, food;
-		loadFile >> x >> y >> velx >> vely >> food;
+		bool prevColl, currColl;
+		loadFile >> x >> y >> velx >> vely >> food >> prevColl >> currColl;
 		chickList[i] = new Chick(pGame, {x, y}, Chick::getChickSizeInX(), Chick::getChickSizeInY(), "images\\chick.jpg");
 		chickList[i]->curr_vel = {velx, vely};
 		chickList[i]->setFoodeaten(food);
+		chickList[i]->setColl(prevColl, currColl);
 	}
 }
 
 void CowIcon::Saving(ofstream& saveFile) const
 {
-	saveFile << count << " ";
+	saveFile << "COWS " << count << "\n";
 	for (int i = 0; i < count; i++) {
 		if (cowList[i]) {
-			saveFile << cowList[i]->curr_pos.x << " " << cowList[i]->curr_pos.y << " " << cowList[i]->curr_vel.x << " " << cowList[i]->curr_vel.y << " " << cowList[i]->getFoodeaten() << " ";
+			saveFile << cowList[i]->curr_pos.x << " " << cowList[i]->curr_pos.y << " " << cowList[i]->curr_vel.x << " " << cowList[i]->curr_vel.y << " " << cowList[i]->getFoodeaten() << " " << cowList[i]->getPrevColl() << " " << cowList[i]->getCurrColl() << "\n";
 		}
 	}
 }
 
 void CowIcon::Loading(ifstream& loadFile) const
 {
-	loadFile >> count;
+	string key;
+	loadFile >> key >> count;
 	for (int i = 0; i < count; i++) {
 		int x, y, velx, vely, food;
-		loadFile >> x >> y >> velx >> vely >> food;
+		bool prevColl, currColl;
+		loadFile >> x >> y >> velx >> vely >> food >> prevColl >> currColl;
 		cowList[i] = new Cow(pGame, {x, y}, Cow::getCowSizeInX(), Cow::getCowSizeInY(), "images\\cow.jpg");
 		cowList[i]->curr_vel = {velx, vely};
 		cowList[i]->setFoodeaten(food);
+		cowList[i]->setColl(prevColl, currColl);
 	}
 }
 
@@ -260,12 +287,15 @@ Budgetbar::~Budgetbar()
 	}
 	delete[] WaterIcon::FoodAreaList;
 	WaterIcon::amount = 0;
+	BudgetbarIcon::setAnimalCounter(0);
 }
 
 void Budgetbar::draw() const
 {
-	for (int i = 0; i < BUDGET_ICON_COUNT; i++)
-	iconsList[i]->draw();
+	for (int i = 0; i < BUDGET_ICON_COUNT; i++) { 
+		iconsList[i]->draw(); 
+		iconsList[i]->setIconProperties();
+	}
 	window* pWind = pGame->getWind();
 	pWind->SetPen(BLACK, 3);
 	pWind->DrawLine(0, 2*config.toolBarHeight, pWind->GetWidth(), 2*config.toolBarHeight);
@@ -309,19 +339,29 @@ WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 	amount = 0;
 }
 
+void WaterIcon::setIconProperties()
+{
+	window* pWind = pGame->getWind();
+	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+	pWind->SetPen(BLACK, 1);
+	pWind->DrawString(RefPoint.x, RefPoint.y + (config.toolBarHeight - 15), "$" + to_string(cost));
+	pWind->DrawString(RefPoint.x + config.iconWidth - 10, RefPoint.y, to_string(amount));
+}
+
 void WaterIcon::Saving(ofstream& saveFile) const
 {
-	saveFile << amount << " ";
+	saveFile << "FOODAREAS " << amount << "\n";
 	for (int i = 0; i < amount; i++) {
 		if (FoodAreaList[i]) {
-			saveFile << FoodAreaList[i]->getFoodAreaRef().x << " " << FoodAreaList[i]->getFoodAreaRef().y << " " << FoodAreaList[i]->getfoodcounter() << " ";
+			saveFile << FoodAreaList[i]->getFoodAreaRef().x << " " << FoodAreaList[i]->getFoodAreaRef().y << " " << FoodAreaList[i]->getfoodcounter() << "\n";
 		}
 	}
 }
 
 void WaterIcon::Loading(ifstream& loadFile) const
 {
-	loadFile >> amount;
+	string key;
+	loadFile >> key >> amount;
 	for (int i = 0; i < amount; i++) {
 		int x, y, food;
 		loadFile >> x >> y >> food;
@@ -347,8 +387,8 @@ void WaterIcon::onClick()
 {
 	cout << "Icon Water Clicked" << endl;
 	// cost 20
-	if (pGame->budget >= 20) {
-		pGame->budget -= 20;
+	if (pGame->budget >= cost) {
+		pGame->budget -= cost;
 		// increase water amount and print
 		// find this icon instance to access amount (this)
 		point p;

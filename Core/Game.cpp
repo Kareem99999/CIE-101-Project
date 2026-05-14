@@ -8,42 +8,19 @@
 #include <iostream>
 using namespace std;
 
-// Level up function to increase the level and set new target budget
-void Game::lvlUp() {
-	if (budget >= targetBudget) {
-		lvl++;
-		restart();
-		targetBudget = budget + 1000;
-		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
-		if (budget >= 1000) {
-			targetBudget += 1000;
-		}
-		else if (budget >= 10000) {
-			targetBudget += 2000;
-		}
-		else if (budget >= 50000) {
-			targetBudget += 5000;
-		}
-		else {
-			targetBudget += 10000;
-		}
-	}
-}
-int Game::getTarget() const {
-	return targetBudget;
-}
-
-
 bool Game::shouldLoad = false;
+int Game::level = 1;
 Game::Game()
 {
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
+	createbackground();
 	createToolbar();
 	createBudgetbar();
 	createWarehouse();
 	createFarm();
 	clearStatusBar();
 	createTimer();
+
 	gameWolf = nullptr;
 	ispaused = false;
 	wolf_delay = new Timer(20 * 1000);
@@ -51,20 +28,49 @@ Game::Game()
 	if (shouldLoad) {
 		shouldLoad = false;
 		ifstream SaveFile("SaveFile.txt");
+		string key1, key2, key3, key4;
 		if (SaveFile) {
 			int currentTime, animalCount;
-			SaveFile >> budget >> currentTime >> animalCount;
-			gameTimer->setDuration(currentTime);
+			SaveFile >> key1 >> level >> key2 >> budget >> key3 >> currentTime >> key4 >> animalCount;
+			gameTimer->setDuration(currentTime * 1000);
 			BudgetbarIcon::setAnimalCounter(animalCount);
 			for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
 				gameBudgetbar->getIcon(i)->Loading(SaveFile);
 			}
+			string WarehouseKey, Egg, Milk;
+			SaveFile >> WarehouseKey;
+			SaveFile >> Egg >> totalcreatedeggs;
+			for (int i = 0; i < totalcreatedeggs; i++) {
+				int x, y;
+				bool enable;
+				SaveFile >> x >> y >> enable;
+				gameEggslist[i] = new eggs(this, { x, y }, 20, 20);
+				gameEggslist[i]->LoadEnability(enable);
+				if (!enable) eggsCounter++;
+			}
+			SaveFile >> Milk >> totalcreatedmilk;
+			for (int i = 0; i < totalcreatedmilk; i++) {
+				int x, y;
+				bool enable;
+				SaveFile >> x >> y >> enable;
+				gameEggslist[i] = new eggs(this, { x, y }, 20, 20);
+				gameEggslist[i]->LoadEnability(enable);
+				if (!enable) milkCounter++;
+			}	
 		}
 		SaveFile.close();
 		printMessage("Game Loaded!");
 	}
 }
-
+void Game::createbackground() {
+	int bgWidth = config.windWidth;
+	int bgHeight = config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight;
+	point backgroundRef;
+	backgroundRef.x = 0;
+	backgroundRef.y = 2* config.toolBarHeight;
+	gameBackground = new background(this, backgroundRef,bgWidth, bgHeight, "images\\Background.jpg");
+	gameBackground->draw();
+}
 
 // Timer implementations (moved here so Timer is merged with Game files)
 TIME Timer::delay = TIMER::now();
@@ -85,7 +91,7 @@ bool Timer::check() const {
 	bool expired = (now >= end);
 	if (expired) {
 		auto remaining_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - now).count();
-		cout << "CHECK: expired=true, remaining=" << remaining_ms << "ms, end time=" << end.time_since_epoch().count() << ", now=" << now.time_since_epoch().count() << endl;
+		//cout << "CHECK: expired=true, remaining=" << remaining_ms << "ms, end time=" << end.time_since_epoch().count() << ", now=" << now.time_since_epoch().count() << endl;
 	}
 	return expired;
 }
@@ -96,6 +102,9 @@ long long Timer::elapsed() const {
 
 long long Timer::remaining() const {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count();
+}
+int Timer::remainingInSeconds() const{
+	return (std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000;
 }
 void Timer::paused() {
 	if (!isPaused) {
@@ -125,12 +134,83 @@ Game::~Game()
 	pWind->SetWaitClose(false);
 	delete pWind;
 	delete wolf_delay;
+	eggsCounter = 0;
+	milkCounter = 0;
+	totalcreatedeggs = 0;
+	totalcreatedmilk = 0;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
 {
 	return pWind->GetMouseClick(x, y);	//Wait for mouse click
 
+}
+void Game::render()
+{
+	gameBackground->draw();
+	gameWarehouse->draw();
+	for (int i = 0; i < WaterIcon::waterAmount(); i++)
+	{
+		if (WaterIcon::FoodAreaList[i])
+			WaterIcon::FoodAreaList[i]->draw();
+	}
+
+	for (int i = 0; i < totalcreatedeggs; i++)
+	{
+		if (gameEggslist[i])
+			gameEggslist[i]->draw();
+	}
+
+	for (int i = 0; i < totalcreatedmilk; i++)
+	{
+		if (gameMilklist[i])
+			gameMilklist[i]->draw();
+	}
+
+	for (int i = 0; i < ChickIcon::count; i++)
+	{
+		if (ChickIcon::chickList[i])
+			ChickIcon::chickList[i]->draw();
+	}
+
+	for (int i = 0; i < CowIcon::count; i++)
+	{
+		if (CowIcon::cowList[i])
+			CowIcon::cowList[i]->draw();
+	}
+
+	if (gameWolf)
+	{
+		gameWolf->draw();
+	}
+
+	gameToolbar->draw();
+	gameBudgetbar->draw();
+}
+void Game::lvlUp(){
+	if (budget >= targetBudget) {
+		level++;
+		budget = 2000 * level;
+		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
+		if (budget >= 1000) {
+			targetBudget += 1000;
+		}
+		else if (budget >= 10000) {
+			targetBudget += 2000;
+		}
+		else if (budget >= 50000) {
+			targetBudget += 5000;
+		}
+		else {
+			targetBudget += 10000;
+		}
+		restart();
+	}
+}
+
+int Game::getTarget()
+{
+	return targetBudget;
 }
 
 void Game::decreaseeggscount() { eggsCounter--; }
@@ -192,12 +272,10 @@ void Game::createFarm()
 	BudgetbarIcon::setRangeMinY(FarmRef.y + Farm::getMargin());
 	BudgetbarIcon::setRangeMaxY(FarmRef.y + Height - Farm::getMargin());
 	gameFarm = new Farm(this, FarmRef, Width, Height, BROWN, DARKGREEN);
-	gameFarm->draw();
 }
 
 void Game::redrawFarm() const
 {
-	gameFarm->draw();
 	for (int i = 0; i < WaterIcon::waterAmount(); i++) if ( WaterIcon::FoodAreaList[i] != nullptr) WaterIcon::FoodAreaList[i]->draw();
 	gameWarehouse->draw();
 }
@@ -225,7 +303,7 @@ void Game::createWarehouse(){
 	int Pwidth = config.windWidth / 4;
 	int Pheight = config.windHeight / 4;
 	
-	gameWarehouse = new Warehouse(this, WarehouseRef, Pwidth, Pheight, GRAY, BLACK);
+	gameWarehouse = new Warehouse(this, WarehouseRef, Pwidth, Pheight, "images\\Warehouse.jpg");
 	gameWarehouse->draw();
 }
 
@@ -237,6 +315,11 @@ void Game::createBudgetbar()
 
 	gameBudgetbar = new Budgetbar(this, budgetbarUpperleft, 0, config.toolBarHeight);
 	gameBudgetbar->draw();
+}
+
+Budgetbar* Game::getBudgetbar() const
+{
+	return gameBudgetbar;
 }
 
 void Game::createTimer()
@@ -265,14 +348,21 @@ int Game::getEggcount() {
 	return eggsCounter;
 }
 
+void Game::changeEggcount() {
+	eggsCounter++;
+}
+
 int Game::getMilkcount() {
 	return milkCounter;
+}
+
+void Game::changeMilkcount() {
+	milkCounter++;
 }
 
 void Game::printBudget(string msg) const
 {
 	clearBudget();	//First clear the status bar
-
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(24, BOLD, BY_NAME, "Arial");
 	pWind->DrawString(config.windWidth-200, config.toolBarHeight + 10, msg);
@@ -309,10 +399,21 @@ Farm* Game::getFarm() const
 
 void Game::saving() const{
 	ofstream SaveFile("SaveFile.txt");
-	SaveFile << budget << " " << gameTimer->remaining() << " " << BudgetbarIcon::getAnimalCounter() << "\n";
+	SaveFile << "LEVEL " << level << "\nBUDGET " << budget << "\nTIMER " << gameTimer->remainingInSeconds() << "\n\nANIMALS " << BudgetbarIcon::getAnimalCounter() << "\n";
 	for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
 		gameBudgetbar->getIcon(i)->Saving(SaveFile);
-		SaveFile << "\n";
+	}
+	SaveFile << "WAREHOUSE\n";
+	SaveFile << "EGGS " << totalcreatedeggs << "\n";
+	for (int i = 0; i < totalcreatedeggs; i++) {
+		if (gameEggslist[i]) {
+			gameEggslist[i]->Saving(SaveFile);
+		}
+	}
+	for (int i = 0; i < totalcreatedmilk; i++) {
+		if (gameMilklist[i]) {
+			gameMilklist[i]->Saving(SaveFile);
+		}
 	}
 	SaveFile.close();
 	printMessage("Game Saved!");
@@ -329,23 +430,34 @@ void Game::restart() {
 
 bool Game::go()
 {
+	
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
-	cout << "gameWolf = " << gameWolf << endl;
+	//cout << "gameWolf = " << gameWolf << endl;
+	int static level = 1;
 	bool isExit = false;
-	bool pausewindow = false;
 	gameEnded = false;
-	Timer delay(300);
-	//Change the title
+	Timer delay(100);
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
 	pWind->DrawString(200, 200, "REAL FILE");
-
+	pWind->SetBuffering(true);
 	do
 	{
+		render();
 		lvlUp();
+		getMouseClick(x, y);
+		for (int i = 0; i < totalcreatedeggs; i++) {
+			if (gameEggslist[i]) {
+				gameEggslist[i]->onClick(x,y);
+			}
+		}
+		for (int i = 0; i < totalcreatedmilk; i++) {
+			if (gameMilklist[i]) {
+				gameMilklist[i]->onClick(x,y);
+			}
+		}
 		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
-			pausewindow = false;
-			if (lvl == 1) {
+			if (level == 1) {
 				if (wolf_delay->check())
 				{
 					createWolf();
@@ -355,8 +467,7 @@ bool Game::go()
 			}
 			if (timeToRestart) { return true; }
 			if (delay.check()) {
-				string status_message = "Level: " + to_string(lvl) + ", Timer:" + modifyTimerToStandard() + ", Goal : " +  to_string(Game::getTarget()) +
-					"$, Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+				string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
 				printMessage(status_message);
 				string budget_string = "BUDGET = $" + to_string(budget);
 				printBudget(budget_string);
@@ -384,7 +495,6 @@ bool Game::go()
 						gameEggslist[totalcreatedeggs] = new eggs(this, ChickIcon::chickList[i]->curr_pos, 20, 20);
 						gameEggslist[totalcreatedeggs]->draw();
 						totalcreatedeggs++;
-						eggsCounter++;
 						ChickIcon::chickList[i]->Resetfoodeaten();
 					}
 				}
@@ -401,7 +511,6 @@ bool Game::go()
 						gameMilklist[totalcreatedmilk] = new milk(this, CowIcon::cowList[i]->curr_pos, 20, 20);
 						gameMilklist[totalcreatedmilk]->draw();
 						totalcreatedmilk++;
-						milkCounter++;
 						CowIcon::cowList[i]->Resetfoodeaten();
 					}
 				}
@@ -411,23 +520,24 @@ bool Game::go()
 				delay.setDuration(300);
 			}
 		}
-		getMouseClick(x, y);
 		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
 			gameWarehouse->onClick();
 		}
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
 		//{
 			//[1] If user clicks on the Toolbar
-		if (y >= 0 && y < config.toolBarHeight)
-		{
-			isExit = gameToolbar->handleClick(x, y);
+		if (!ispaused) {
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
+			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+			{
+				isExit = gameBudgetbar->handleClick(x, y);
+			}
+			//}
 		}
-		else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
-		{
-			isExit = gameBudgetbar->handleClick(x, y);
-		}
-		//}
-		if (ispaused && pausewindow == false)
+		if (ispaused)
 		{
 			int centerX = config.windWidth / 2;
 			int centerY = config.windHeight / 2;
@@ -448,9 +558,12 @@ bool Game::go()
 			pWind->SetFont(40, BOLD, BY_NAME, "Arial");
 			pWind->SetPen(color(255, 100, 100), 1);
 			pWind->DrawString(centerX - 80, centerY - 15, "PAUSED");
-			pausewindow = true;
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
 		}
-		if (gameTimer->remaining() <= 0 && !gameEnded && budget < 50000)
+		if (gameTimer->remaining() <= 0  && budget < 50000)
 		{
 			gameEnded = true;
 			{
@@ -469,6 +582,7 @@ bool Game::go()
 
 			}
 		}
+		pWind->UpdateBuffer();
 	} while (!isExit);
 
 		return !isExit;

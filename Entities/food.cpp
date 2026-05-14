@@ -1,51 +1,21 @@
 #include "Food.h"
 #include "../Core/Game.h"
+#include <fstream>
+
+int food::sellprice = 0;
 food :: food(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
 	amount = 0;
 	sellprice = 0;
-	buyprice = 0;
 	name = "";
 	foodImagePath = img_path;
-}
-/*grass::grass(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
-	: food(r_pGame, r_point, r_width, r_height, img_path)
-{
-	name = "GRASS";
-	buyprice = 50;
-	sellprice = 0;
-	amount = 0;
-	
-}
-void grass::buy()
-{
-	if (pGame->budget >= buyprice) {
-		amount++;
-		pGame->budget -= buyprice;
-	}
-}
-void grass::sell()
-{
-	//TO DO: add code for selling grass here
-}
-void grass::addFood(int amount)
-{
-	this->amount += amount;
-}
-*/
-void food::draw() const
-{
-	//draw image of this object
-	window* pWind = pGame->getWind();
-	pWind->DrawImage(foodImagePath, RefPoint.x, RefPoint.y, width, height);
 }
 
 eggs::eggs(Game* r_pGame, point r_point, int r_width, int r_height)
 	: food(r_pGame, r_point, r_width, r_height, "images\\EGG.jpg")
 {
 	name = "EGGS";
-	buyprice = 0;
-	sellprice = 20;
+	sellprice = 50;
 	amount = 0;
 	
 }
@@ -53,58 +23,75 @@ void eggs::addFood(int amount)
 {
 	this->amount += amount;
 }
-void eggs::buy()
-{
-	//TO DO: add code for buying eggs here
-}
 void eggs :: draw() const
 {
-	//draw image of this object
+	if (!enableDrawing) return;
 	window* pWind = pGame->getWind();
 	pWind->DrawImage("images\\EGG.jpeg", RefPoint.x, RefPoint.y, width, height);
 }
-void eggs::sell()
+int eggs::getsellPrice()
 {
-	if (amount > 0)
+	return sellprice;
+}
+
+void eggs::onClick(int posX, int posY)
+{
+	if (posX >= RefPoint.x && posX <= RefPoint.x + 20 && posY >= RefPoint.y && posY <= RefPoint.y + 20 && enableDrawing)
 	{
-		amount--;
-		pGame->budget += (sellprice);
-		pGame->lvlUp();
+		enableDrawing = false;
+		pGame->changeEggcount();
 	}
 }
 
+void eggs::Saving(ofstream& saveFile) const
+{
+	saveFile << RefPoint.x << " " << RefPoint.y << " " << enableDrawing << "\n";
+}
 
+void eggs::LoadEnability(bool enable)
+{
+	enableDrawing = enable;
+}
 
 milk::milk(Game* r_pGame, point r_point, int r_width, int r_height)
 	: food(r_pGame, r_point, r_width, r_height, "images\\MILK.jpg")
 {
 	name = "MILK";
-	buyprice = 0;
-	sellprice = 50;
+	sellprice = 500;
 	amount = 0;
 	
+}
+
+void milk::onClick(int posX, int posY)
+{
+	if (posX >= RefPoint.x && posX <= RefPoint.x + 20 && posY >= RefPoint.y && posY <= RefPoint.y + 20 && enableDrawing)
+	{
+		enableDrawing = false;
+		pGame->changeMilkcount();
+	}
 }
 void milk::addFood(int amount)
 {
 	this->amount += amount;
 }
-void milk::buy()
-{
-	//TO DO: add code for buying milk here
-}
 void milk:: draw() const
 {
-	//draw image of this object
+	if (!enableDrawing) return;
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(foodImagePath, RefPoint.x, RefPoint.y, width, height);
+	pWind->DrawImage(foodImagePath, RefPoint.x + Cow::getCowSizeInX(), RefPoint.y, width, height);
 }
-void milk::sell()
+int milk::getsellPrice()
 {
-	if (amount > 0)
-	{
-		amount--;
-		pGame->budget += sellprice;
-		pGame->lvlUp();
-	}
+	return sellprice;
 }
+
+void milk::Saving(ofstream& saveFile) const
+{
+	saveFile << RefPoint.x << " " << RefPoint.y << " " << enableDrawing << "\n";
+}
+void milk::LoadEnability(bool enable)
+{
+	enableDrawing = enable;
+}
+
 // to do see wtf is the addBugdet function and if not there do it
