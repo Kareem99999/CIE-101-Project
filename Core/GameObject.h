@@ -42,8 +42,9 @@ class Warehouse : public GameObject {
 protected:
 	int WarehouseWidth = 0;
 	int WarehouseHeight = 0;
+	std::string image_path;
 public:
-	Warehouse(Game * r_pGame, point ref, int r_width, int r_height, color fc, color bc);
+	Warehouse(Game * r_pGame, point ref, int r_width, int r_height, string img_path);
 	void draw() const override;
 	void onClick();
 	int getWarehouseWidth();
@@ -56,6 +57,7 @@ protected:
 	static int FoodAreaWidth;
 	static int FoodAreaHeight;
 	int foodcounter = 3;
+	std::string img_path;
 public:
 	FoodArea(Game* r_pGame, point ref);
 	void draw() const override;
@@ -64,4 +66,12 @@ public:
 	point getFoodAreaRef();
 	void decreaseFood(int x);
 	int getfoodcounter();
+};
+class background : public Drawable
+{
+private:
+	std::string image_path;
+public:
+	background(Game* r_pGame, point ref, int r_width, int r_height, string img_path);
+	void draw() const override;
 };

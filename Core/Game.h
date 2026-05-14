@@ -45,6 +45,7 @@ private:
 	int totalcreatedmilk = 0;
 	Wolf* gameWolf;
 	int static level;
+	background* gameBackground;
 
 public:
 	Timer* gameTimer;
@@ -89,6 +90,8 @@ public:
 	void saving() const;
 	void startLoading();
 	void restart();
+	void createbackground();
+	void render();
 
 	window* getWind() const;		//returns pointer to the graphics window
 };

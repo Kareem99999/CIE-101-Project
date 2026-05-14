@@ -13,12 +13,14 @@ int Game::level = 1;
 Game::Game()
 {
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
+	createbackground();
 	createToolbar();
 	createBudgetbar();
 	createWarehouse();
 	createFarm();
 	clearStatusBar();
 	createTimer();
+
 	gameWolf = nullptr;
 	ispaused = false;
 	wolf_delay = new Timer(20 * 1000);
@@ -60,7 +62,15 @@ Game::Game()
 		printMessage("Game Loaded!");
 	}
 }
-
+void Game::createbackground() {
+	int bgWidth = config.windWidth;
+	int bgHeight = config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight;
+	point backgroundRef;
+	backgroundRef.x = 0;
+	backgroundRef.y = 2* config.toolBarHeight;
+	gameBackground = new background(this, backgroundRef,bgWidth, bgHeight, "images\\Background.jpg");
+	gameBackground->draw();
+}
 
 // Timer implementations (moved here so Timer is merged with Game files)
 TIME Timer::delay = TIMER::now();
@@ -135,7 +145,48 @@ clicktype Game::getMouseClick(int& x, int& y) const
 	return pWind->GetMouseClick(x, y);	//Wait for mouse click
 
 }
+void Game::render()
+{
+	gameBackground->draw();
+	gameWarehouse->draw();
+	for (int i = 0; i < WaterIcon::waterAmount(); i++)
+	{
+		if (WaterIcon::FoodAreaList[i])
+			WaterIcon::FoodAreaList[i]->draw();
+	}
 
+	for (int i = 0; i < totalcreatedeggs; i++)
+	{
+		if (gameEggslist[i])
+			gameEggslist[i]->draw();
+	}
+
+	for (int i = 0; i < totalcreatedmilk; i++)
+	{
+		if (gameMilklist[i])
+			gameMilklist[i]->draw();
+	}
+
+	for (int i = 0; i < ChickIcon::count; i++)
+	{
+		if (ChickIcon::chickList[i])
+			ChickIcon::chickList[i]->draw();
+	}
+
+	for (int i = 0; i < CowIcon::count; i++)
+	{
+		if (CowIcon::cowList[i])
+			CowIcon::cowList[i]->draw();
+	}
+
+	if (gameWolf)
+	{
+		gameWolf->draw();
+	}
+
+	gameToolbar->draw();
+	gameBudgetbar->draw();
+}
 void Game::lvlUp(){
 	if (budget >= targetBudget) {
 		level++;
@@ -221,12 +272,10 @@ void Game::createFarm()
 	BudgetbarIcon::setRangeMinY(FarmRef.y + Farm::getMargin());
 	BudgetbarIcon::setRangeMaxY(FarmRef.y + Height - Farm::getMargin());
 	gameFarm = new Farm(this, FarmRef, Width, Height, BROWN, DARKGREEN);
-	gameFarm->draw();
 }
 
 void Game::redrawFarm() const
 {
-	gameFarm->draw();
 	for (int i = 0; i < WaterIcon::waterAmount(); i++) if ( WaterIcon::FoodAreaList[i] != nullptr) WaterIcon::FoodAreaList[i]->draw();
 	gameWarehouse->draw();
 }
@@ -254,7 +303,7 @@ void Game::createWarehouse(){
 	int Pwidth = config.windWidth / 4;
 	int Pheight = config.windHeight / 4;
 	
-	gameWarehouse = new Warehouse(this, WarehouseRef, Pwidth, Pheight, GRAY, BLACK);
+	gameWarehouse = new Warehouse(this, WarehouseRef, Pwidth, Pheight, "images\\Warehouse.jpg");
 	gameWarehouse->draw();
 }
 
@@ -314,7 +363,6 @@ void Game::changeMilkcount() {
 void Game::printBudget(string msg) const
 {
 	clearBudget();	//First clear the status bar
-
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(24, BOLD, BY_NAME, "Arial");
 	pWind->DrawString(config.windWidth-200, config.toolBarHeight + 10, msg);
@@ -388,7 +436,6 @@ bool Game::go()
 	//cout << "gameWolf = " << gameWolf << endl;
 	int static level = 1;
 	bool isExit = false;
-	bool pausewindow = false;
 	gameEnded = false;
 	Timer delay(100);
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
@@ -396,8 +443,7 @@ bool Game::go()
 	pWind->SetBuffering(true);
 	do
 	{
-		gameBudgetbar->draw();
-		gameToolbar->draw();
+		render();
 		lvlUp();
 		getMouseClick(x, y);
 		for (int i = 0; i < totalcreatedeggs; i++) {
@@ -411,7 +457,6 @@ bool Game::go()
 			}
 		}
 		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
-			pausewindow = false;
 			if (level == 1) {
 				if (wolf_delay->check())
 				{
@@ -481,16 +526,18 @@ bool Game::go()
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
 		//{
 			//[1] If user clicks on the Toolbar
-		if (y >= 0 && y < config.toolBarHeight)
-		{
-			isExit = gameToolbar->handleClick(x, y);
+		if (!ispaused) {
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
+			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+			{
+				isExit = gameBudgetbar->handleClick(x, y);
+			}
+			//}
 		}
-		else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
-		{
-			isExit = gameBudgetbar->handleClick(x, y);
-		}
-		//}
-		if (ispaused && pausewindow == false)
+		if (ispaused)
 		{
 			int centerX = config.windWidth / 2;
 			int centerY = config.windHeight / 2;
@@ -511,9 +558,12 @@ bool Game::go()
 			pWind->SetFont(40, BOLD, BY_NAME, "Arial");
 			pWind->SetPen(color(255, 100, 100), 1);
 			pWind->DrawString(centerX - 80, centerY - 15, "PAUSED");
-			pausewindow = true;
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
 		}
-		if (gameTimer->remaining() <= 0 && !gameEnded && budget < 50000)
+		if (gameTimer->remaining() <= 0  && budget < 50000)
 		{
 			gameEnded = true;
 			{

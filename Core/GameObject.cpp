@@ -80,17 +80,16 @@ void Farm::keepInFarm(point& position, point& velocity, point dimensions, int ma
 	}
 }
 
-Warehouse::Warehouse(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc) : GameObject(r_pGame, ref, r_width, r_height, fc, bc) {
+Warehouse::Warehouse(Game* r_pGame, point ref, int r_width, int r_height, string img_path) : GameObject(r_pGame, ref, r_width, r_height, BLACK, BLACK ) {
 	WarehouseWidth = r_width;
 	WarehouseHeight = r_height;
+	image_path = img_path;
 };
 
 void Warehouse::draw() const
 {
 	window* pWind = pGame->getWind();
-	pWind->SetBrush(fillColor);
-	pWind->SetPen(borderColor, 4);
-	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + WarehouseWidth, RefPoint.y + WarehouseHeight);
+	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, WarehouseWidth, WarehouseHeight);
 };
 
 int Warehouse::getWarehouseWidth() { return WarehouseWidth; }
@@ -146,15 +145,16 @@ void Warehouse::onClick() {
 }
 
 FoodArea::FoodArea(Game* r_pGame, point ref) : GameObject(r_pGame, ref, 50, 50, GREEN, GREEN)
-{}
+{
+	img_path = "images\\GRASS.jpg";
+}
 
 void FoodArea::draw() const
 {
 	window* pWind = pGame->getWind();
-	pWind->SetBrush(fillColor);
-	pWind->SetPen(borderColor, 4);
-	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + FoodAreaWidth, RefPoint.y + FoodAreaHeight);
+	pWind->DrawImage(img_path, RefPoint.x, RefPoint.y, FoodAreaWidth, FoodAreaHeight);// DRAWS the grass image as the food area
 	pWind->SetPen(BLACK, 4);
+	pWind->SetFont(30, BOLD, BY_NAME, "Arial");
 	pWind->DrawString(RefPoint.x + FoodAreaWidth / 2 - 7, RefPoint.y + FoodAreaHeight / 2 - 12, to_string(foodcounter));
 }
 
@@ -168,3 +168,12 @@ point FoodArea::getFoodAreaRef()
 
 void FoodArea::decreaseFood(int x) { foodcounter -= x; }
 int FoodArea::getfoodcounter() {return foodcounter;};
+background::background(Game* r_pGame, point ref, int r_width, int r_height, string img_path) : Drawable(r_pGame, ref, r_width, r_height)
+{
+	image_path = img_path;
+}
+void background::draw() const
+{
+	window* pWind = pGame->getWind();
+	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+}
