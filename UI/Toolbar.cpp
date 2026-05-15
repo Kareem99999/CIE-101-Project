@@ -1,7 +1,7 @@
+#include<iostream>
 #include "Toolbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
-#include<iostream>
 using namespace std;
 
 ToolbarIcon::ToolbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)

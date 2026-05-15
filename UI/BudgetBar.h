@@ -1,10 +1,10 @@
 #pragma once
+#include <limits>
+#include <random>
 #include "../Core/Drawable.h"
 #include "../Core/Gameobject.h"
-#include "../Entities/Animal.h"
 #include "../Config/GameConfig.h"
-#include <random>
-#include <limits>
+#include "../Entities/Animal.h"
 
 //Base class for all toolbar icons 
 class BudgetbarIcon :public Drawable

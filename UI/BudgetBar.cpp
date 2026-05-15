@@ -1,10 +1,8 @@
+#include <fstream>
+#include <iostream>
 #include "Budgetbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
-#include "../Entities/Animal.h"
-#include "../Core/GameObject.h"
-#include <iostream>
-#include <fstream>
 using namespace std;
 
 int BudgetbarIcon::AnimalsCounter = 0;

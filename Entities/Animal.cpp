@@ -1,9 +1,9 @@
+#include <iostream>
 #include "Animal.h"
+#include "food.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
 #include "../Core/GameObject.h"
-#include "food.h"
-#include <iostream>
 using namespace std;
 
 point Chick::chickDimensions = { 50,50 };
@@ -17,77 +17,6 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 	curr_vel.x = 4;
 	curr_vel.y = 4;
 
-}
-
-
-void Chick::ifColl() {
-	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
-		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
-		if (WaterIcon::FoodAreaList[i] != nullptr) {
-			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
-			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
-			point FoodAref = FoodA->getFoodAreaRef();
-			if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
-			else { CurrCollwithFoodArea[i] = false;	}
-			if (CurrCollwithFoodArea[i] == true && PrevCollwithFoodArea[i] == false) {
-				FoodA->decreaseFood(1);
-				foodeaten += 1;
-			}
-		}
-	}
-};
-
-void Cow::ifColl() {
-	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
-		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
-		if (WaterIcon::FoodAreaList[i] != nullptr) {
-			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
-			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
-			point FoodAref = FoodA->getFoodAreaRef();
-			if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
-			else { CurrCollwithFoodArea[i] = false; }
-			if (CurrCollwithFoodArea[i] == true && PrevCollwithFoodArea[i] == false) {
-				FoodA->decreaseFood(1);
-				foodeaten += 1;
-			}
-		}
-	}
-};
-
-int Cow::getFoodeaten()
-{
-	return foodeaten;
-}
-
-void Cow::setFoodeaten(int value)
-{
-	foodeaten = value;
-}
-
-int Chick::getFoodeaten()
-{
-	return foodeaten;
-}
-
-void Chick::setFoodeaten(int value)
-{
-	foodeaten = value;
-}
-
-void Cow::Resetfoodeaten()
-{
-	foodeaten = 0;
-}
-
-void Chick::Resetfoodeaten()
-{
-	foodeaten = 0;
 }
 
 void Animal::draw() const
@@ -133,6 +62,11 @@ string Animal::getImagePath() const
 //	}
 //}
 
+
+
+
+// ####################++++++++++----------CHICK----------++++++++++####################
+
 Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
 	for (int i = 0; i < 15; i++) {
@@ -158,24 +92,7 @@ int Chick::getChickSizeInY()
 {
 	return chickDimensions.y;
 }
-int Chick::getremainingfood() const {
-	int needed = 2;
-	if (this->foodeaten == 0) return needed;
-	return needed - this->foodeaten;
-}
-bool Chick::getPrevColl() const
-{
-	return prev_coll;
-}
-bool Chick::getCurrColl() const
-{
-	return current_coll;
-}
-void Chick::setColl(bool prev, bool curr)
-{
-	prev_coll = prev;
-	current_coll = curr;
-}
+
 void Chick::moveStep()
 {
 	window* pWind = pGame->getWind();
@@ -186,6 +103,68 @@ void Chick::moveStep()
 	pWind->DrawImage(getImagePath(), curr_pos.x, curr_pos.y, width, height);
 	draw();
 }
+
+void Chick::ifColl() {
+	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
+		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
+		if (WaterIcon::FoodAreaList[i] != nullptr) {
+			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
+			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
+			point FoodAref = FoodA->getFoodAreaRef();
+			if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x + chickDimensions.x >= FoodAref.x && RefPoint.x + chickDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + chickDimensions.y >= FoodAref.y && RefPoint.y + chickDimensions.y <= FoodAref.y + FoodAsize.y) { current_coll = true; }
+			else { CurrCollwithFoodArea[i] = false; }
+			if (CurrCollwithFoodArea[i] == true && PrevCollwithFoodArea[i] == false) {
+				FoodA->decreaseFood(1);
+				foodeaten += 1;
+			}
+		}
+	}
+};
+
+bool Chick::getPrevColl() const
+{
+	return prev_coll;
+}
+
+bool Chick::getCurrColl() const
+{
+	return current_coll;
+}
+
+void Chick::setColl(bool prev, bool curr)
+{
+	prev_coll = prev;
+	current_coll = curr;
+}
+
+int Chick::getFoodeaten()
+{
+	return foodeaten;
+}
+
+void Chick::setFoodeaten(int value)
+{
+	foodeaten = value;
+}
+
+void Chick::Resetfoodeaten()
+{
+	foodeaten = 0;
+}
+
+int Chick::getremainingfood() const {
+	int needed = 2;
+	if (this->foodeaten == 0) return needed;
+	return needed - this->foodeaten;
+}
+
+
+
+
+// ####################++++++++++----------COW----------++++++++++####################
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
@@ -224,24 +203,69 @@ void Cow::moveStep()
 	draw();
 
 }
-int Cow::getremainingfood()const {
-	int needed = 4;
-	if (this->foodeaten == 0) return needed;
-	return needed - this->foodeaten;
+
+void Cow::ifColl() {
+	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
+		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
+		if (WaterIcon::FoodAreaList[i] != nullptr) {
+			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
+			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
+			point FoodAref = FoodA->getFoodAreaRef();
+			if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y >= FoodAref.y && RefPoint.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x >= FoodAref.x && RefPoint.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else if (RefPoint.x + cowDimensions.x >= FoodAref.x && RefPoint.x + cowDimensions.x <= FoodAref.x + FoodAsize.x && RefPoint.y + cowDimensions.y >= FoodAref.y && RefPoint.y + cowDimensions.y <= FoodAref.y + FoodAsize.y) { CurrCollwithFoodArea[i] = true; }
+			else { CurrCollwithFoodArea[i] = false; }
+			if (CurrCollwithFoodArea[i] == true && PrevCollwithFoodArea[i] == false) {
+				FoodA->decreaseFood(1);
+				foodeaten += 1;
+			}
+		}
+	}
 }
+
 bool Cow::getPrevColl() const
 {
 	return prev_coll;
 }
+
 bool Cow::getCurrColl() const
 {
 	return current_coll;
 }
+
 void Cow::setColl(bool prev, bool curr)
 {
 	prev_coll = prev;
 	current_coll = curr;
 }
+
+int Cow::getFoodeaten()
+{
+	return foodeaten;
+}
+
+void Cow::setFoodeaten(int value)
+{
+	foodeaten = value;
+}
+
+void Cow::Resetfoodeaten()
+{
+	foodeaten = 0;
+}
+
+int Cow::getremainingfood()const {
+	int needed = 4;
+	if (this->foodeaten == 0) return needed;
+	return needed - this->foodeaten;
+}
+
+
+
+
+// ####################++++++++++----------WOLF----------++++++++++####################
+
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: Animal(r_pGame, r_point, r_width, r_height, img_path)
 {

@@ -1,11 +1,10 @@
 #pragma once
-#include "../CMUgraphicsLib/CMUgraphics.h"
-#include "../UI/Toolbar.h"
-#include "../UI/BudgetBar.h"
-#include "../Entities/food.h"
 #include <chrono>
+#include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../Core/GameObject.h"
-
+#include "../Entities/food.h"
+#include "../UI/BudgetBar.h"
+#include "../UI/Toolbar.h"
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
 

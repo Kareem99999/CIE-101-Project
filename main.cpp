@@ -1,7 +1,6 @@
-#include "./Core/Game.h"
-#include <windows.h>
 #pragma comment(lib, "winmm.lib")
-
+#include <windows.h>
+#include "./Core/Game.h"
 
 int main()
 {

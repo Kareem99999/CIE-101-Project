@@ -1,11 +1,9 @@
-#include "Game.h"
-#include "../Config/GameConfig.h"
-#include "GameObject.h"
-#include "../UI/BudgetBar.h"
 #include <thread>
-#include <chrono>
 #include <fstream>
 #include <iostream>
+#include "GameObject.h"
+#include "Game.h"
+#include "../Config/GameConfig.h"
 using namespace std;
 
 bool Game::shouldLoad = false;
