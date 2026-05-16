@@ -63,6 +63,34 @@ void Timer::resume() {
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^TIMER^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+// #####################++++++++-------Level go up ^^ Level go down vv-------++++++++#####################
+void Game::lvlUp() {
+	if (budget >= targetBudget) {
+		level++;
+		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
+		if (budget >= 1000) {
+			targetBudget += 1000;
+		}
+		else if (budget >= 10000) {
+			targetBudget += 2000;
+		}
+		else if (budget >= 50000) {
+			targetBudget += 5000;
+		}
+		else {
+			targetBudget += 10000;
+		}
+		budget += 500;
+	}
+}
+
+int Game::getTarget()
+{
+	return targetBudget;
+}
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^LEVELING^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 
 
 
@@ -197,37 +225,6 @@ void Game::render()
 	gameToolbar->draw();
 	gameBudgetbar->draw();
 }
-
-
-
-// #####################++++++++-------Level go up ^^ Level go down vv-------++++++++#####################
-void Game::lvlUp() {
-	if (budget >= targetBudget) {
-		level++;
-		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
-		if (budget >= 1000) {
-			targetBudget += 1000;
-		}
-		else if (budget >= 10000) {
-			targetBudget += 2000;
-		}
-		else if (budget >= 50000) {
-			targetBudget += 5000;
-		}
-		else {
-			targetBudget += 10000;
-		}
-		budget += 500;
-	}
-}
-
-int Game::getTarget()
-{
-	return targetBudget;
-}
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^LEVELING^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
 
 
 void Game::decreaseeggscount() { eggsCounter--; }
@@ -462,6 +459,15 @@ bool Game::go()
 		render();
 		lvlUp();
 		getMouseClick(x, y);
+
+		if (gameWolf) {
+			if (gameWolf->slayed(x, y)) {
+				delete gameWolf;
+				gameWolf = nullptr;
+				printMessage("Wolf slayed!");
+			}
+		}
+
 		for (int i = 0; i < totalcreatedeggs; i++) {
 			if (gameEggslist[i]) {
 				gameEggslist[i]->onClick(x,y);
@@ -483,7 +489,9 @@ bool Game::go()
 			}
 			if (timeToRestart) { return true; }
 			if (delay.check()) {
-				string status_message = "Level: 1, Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+				string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard() + ", Goal: "
+					+ to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter())
+					+ ", Water Amount : " + to_string(WaterIcon::waterAmount());
 				printMessage(status_message);
 				string budget_string = "BUDGET = $" + to_string(budget);
 				printBudget(budget_string);
@@ -536,7 +544,8 @@ bool Game::go()
 				delay.setDuration(300);
 			}
 		}
-		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth()
+			&& y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
 			gameWarehouse->onClick();
 		}
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
@@ -579,7 +588,7 @@ bool Game::go()
 				isExit = gameToolbar->handleClick(x, y);
 			}
 		}
-		if (gameTimer->remaining() <= 0  && budget < 50000)
+		if (gameTimer->remaining() <= 0  && budget < targetBudget)
 		{
 			gameEnded = true;
 			{
