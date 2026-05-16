@@ -1,14 +1,15 @@
-#include <iostream>
-#include <random>
-#include "Game.h"
 #include "GameObject.h"
+#include "Game.h"
 #include "../Config/GameConfig.h"
+#include <random>
+#include <iostream>
 
-int Farm::margin = 30;
+int Farm::margin = 10;
 int Farm::FarmWidth = 10;
 int Farm::FarmHeight = 10;
 int FoodArea::FoodAreaWidth = 50;
 int FoodArea::FoodAreaHeight = 50;
+int Warehouse::storageLimit = 60;
 GameObject::GameObject(Game* r_pGame, point ref, int r_width, int r_height, color fc, color bc) : Drawable (r_pGame, ref, r_width, r_height)
 {
 	fillColor = fc;
@@ -95,6 +96,7 @@ void Warehouse::draw() const
 int Warehouse::getWarehouseWidth() { return WarehouseWidth; }
 int Warehouse::getWarehouseHeight() { return WarehouseHeight; }
 point Warehouse::getRefPoint() { return RefPoint; }
+int Warehouse::getStorageLimit() { return storageLimit; }
 
 void Warehouse::onClick() {
 	window* WarehouseWind;
@@ -113,6 +115,7 @@ void Warehouse::onClick() {
 	WarehouseWind->DrawRectangle(0, 0, 0.1 * config.windWidth, 0.1 * config.windHeight);
 	WarehouseWind->DrawString(0.035 * config.windWidth, 0.03 * config.windHeight, "Exit");
 	while (WarehouseWind) {
+		if (WarehouseWind == nullptr) break;
 		WarehouseWind->SetPen(BLACK, 4);
 		WarehouseWind->DrawString(.17 * config.windWidth, 0.6 * config.windHeight, "Count:" + to_string(pGame->getEggcount()));
 		WarehouseWind->DrawString(.58 * config.windWidth, 0.6 * config.windHeight, "Count:" + to_string(pGame->getMilkcount()));

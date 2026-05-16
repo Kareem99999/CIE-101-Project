@@ -1,10 +1,11 @@
 #pragma once
-#include <chrono>
 #include "../CMUgraphicsLib/CMUgraphics.h"
-#include "../Core/GameObject.h"
-#include "../Entities/food.h"
-#include "../UI/BudgetBar.h"
 #include "../UI/Toolbar.h"
+#include "../UI/BudgetBar.h"
+#include "../Entities/food.h"
+#include <chrono>
+#include "../Core/GameObject.h"
+
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
 
@@ -36,19 +37,23 @@ private:
 	Budgetbar* gameBudgetbar;
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
-	eggs** gameEggslist = new eggs* [100];
+	eggs** gameEggslist;
 	int eggsCounter = 0;
 	int totalcreatedeggs = 0;
-	milk** gameMilklist = new milk*[100];
+	milk** gameMilklist;
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
-	Wolf* gameWolf;
-	background* gameBackground;
+	Wolf** gameWolves;
 	int static level;
+	background* gameBackground;
+	int totalcreatedwolves = 0;
+	int currentWolves = 0;
+
 public:
 	Timer* gameTimer;
 	Timer* wolf_delay;
 	int budget = 2000;
+	int static WolfNextTimeStamp;
 	int targetBudget = budget + 1000;
 	bool ispaused;
 	bool gameEnded;
@@ -75,12 +80,14 @@ public:
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	void createFarm();
-	void redrawFarm() const;
+	//void redrawFarm() const;
 	void createWarehouse();
 	int getEggcount();
 	int getMilkcount();
 	void changeEggcount();
 	void changeMilkcount();
+	void createEgg(Chick* chick);
+	void createMilk(Cow* cow);
 	Farm* getFarm() const;
 	void decreasemilkcount();
 	void decreaseeggscount();
