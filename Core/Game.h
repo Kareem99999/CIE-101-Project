@@ -5,10 +5,14 @@
 #include "../Entities/food.h"
 #include <chrono>
 #include "../Core/GameObject.h"
-
+#include <random>
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
-
+enum weathertype {
+	sunny,
+	deserted,
+	rainy
+};
 class Timer {
 private:
 	TIME start = TIME();
@@ -48,6 +52,10 @@ private:
 	background* gameBackground;
 	int totalcreatedwolves = 0;
 	int currentWolves = 0;
+	weathertype currentweather;
+	Timer* weathertimer;
+	Timer* weatherMessageTimer;
+	bool showWeatherMessage = false;
 
 public:
 	Timer* gameTimer;
@@ -55,7 +63,7 @@ public:
 	int budget = 2000;
 	int static WolfNextTimeStamp;
 	int targetBudget = budget + 1000;
-	bool isPaused;
+	bool ispaused;
 	bool gameEnded;
 	bool timeToRestart = false;
 	static bool shouldLoad;
@@ -97,7 +105,9 @@ public:
 	void restart();
 	void createbackground();
 	void render();
-
+	weathertype getCurrentWeather() const;
+	void changeweather();
+	void applyWeather(weathertype);
 	window* getWind() const;		//returns pointer to the graphics window
 };
 

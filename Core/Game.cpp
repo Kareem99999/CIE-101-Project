@@ -9,6 +9,7 @@
 using namespace std;
 
 bool Game::shouldLoad = false;
+bool loadedWeather = false;
 int Game::WolfNextTimeStamp = 300 - 20;
 int Game::level = 1;
 Game::Game()
@@ -21,7 +22,9 @@ Game::Game()
 	createFarm();
 	clearStatusBar();
 	createTimer();
-	
+	weatherMessageTimer = new Timer(0);
+	currentweather = sunny;
+	weathertimer = new Timer(2000);
 	gameEggslist = new eggs * [100];
 	gameMilklist = new milk * [100];
 	gameWolves = new Wolf * [12];
@@ -33,7 +36,7 @@ Game::Game()
 	for (int i = 0; i < 12; i++) {
 		gameWolves[i] = nullptr;
 	}
-	isPaused = false;
+	ispaused = false;
 	wolf_delay = new Timer(20 * 1000);
 
 	if (shouldLoad) {
@@ -81,7 +84,19 @@ Game::Game()
 				gameMilklist[i]->LoadEnability(enable);
 				gameMilklist[i]->appearingTimer->setDuration(remainingTime * 1000);
 				if (!enable) milkCounter++;
+				string weatherKey;
+				int weatherValue;
 			}	
+			string weatherKey;
+			int weatherValue;
+			int weatherRemaining;
+
+			SaveFile >> weatherKey >> weatherValue >> weatherRemaining;
+
+			currentweather = (weathertype)weatherValue;
+			weathertimer->setDuration(weatherRemaining * 1000);
+			loadedWeather = true;
+			applyWeather(currentweather);
 		}
 		SaveFile.close();
 		printMessage("Game Loaded!");
@@ -165,6 +180,8 @@ Game::~Game()
 	milkCounter = 0;
 	totalcreatedeggs = 0;
 	totalcreatedmilk = 0;
+	delete weathertimer;
+	delete weatherMessageTimer;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
@@ -226,8 +243,8 @@ void Game::render()
 	for (int i = 0; i < 15; i++) {
 		if (CowIcon::cowList[i]) {
 			counter++;
-			CowIcon::cowList[i]->moveStep();
 			CowIcon::cowList[i]->ifColl();
+			CowIcon::cowList[i]->moveStep();
 			for (int x = 0; x < WaterIcon::waterAmount(); x++) {
 				if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
 					delete WaterIcon::FoodAreaList[x];
@@ -243,13 +260,166 @@ void Game::render()
 		if (counter >= CowIcon::count) { break; }
 	}
 	counter = 0;
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < 2; i++) {
 		if (gameWolves[i]) {
 			gameWolves[i]->moveStep();
 		}
 	}
-}
+	if (showWeatherMessage)
+	{
+		if (weatherMessageTimer->check())
+		{
+			showWeatherMessage = false;
+		}
+		else
+		{
+			int centerX = config.windWidth / 2;
+			int topY = 140;
 
+			pWind->SetPen(BLACK, 2);
+			pWind->SetBrush(color(240, 240, 240));
+
+			pWind->DrawRectangle(
+				centerX - 220,
+				topY,
+				centerX + 220,
+				topY + 70,
+				FILLED,
+				15,
+				15
+			);
+
+			pWind->SetFont(28, BOLD, BY_NAME, "Arial");
+
+			if (currentweather == sunny)
+			{
+				pWind->SetPen(ORANGE, 2);
+				pWind->DrawString(centerX - 140, topY + 20,
+					"SUNNY WEATHER INCOMING");
+			}
+			else if (currentweather == rainy)
+			{
+				pWind->SetPen(BLUE, 2);
+				pWind->DrawString(centerX - 140, topY + 20,
+					"RAINY WEATHER INCOMING");
+			}
+			else
+			{
+				pWind->SetPen(RED, 2);
+				pWind->DrawString(centerX - 145, topY + 20,
+					"DESERT WEATHER INCOMING");
+			}
+		}
+	}
+}
+weathertype Game::getCurrentWeather() const
+{
+	return currentweather;
+}
+void Game::applyWeather(weathertype w)
+{
+	currentweather = w;
+
+	delete gameBackground;
+
+	if (w == sunny)
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\background.jpg");
+	else if (w == rainy)
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\Rainy.jpg");
+	else
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\Desert.jpg");
+}
+void Game::changeweather()
+{
+	if (loadedWeather)
+	{
+		loadedWeather = false; 
+		return; 
+	}
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> dist(0, 2);
+
+	int r = dist(gen);
+	currentweather = (weathertype)r;
+
+	if (currentweather == sunny)
+	{
+		delete gameBackground;
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\background.jpg");
+	}
+	else if (currentweather == rainy)
+	{
+		delete gameBackground;
+
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\Rainy.jpg");
+
+		// Spawn free food areas during rain
+		for (int i = 0; i < 2; i++)
+		{
+			point p;
+
+			std::random_device rd1;
+			std::mt19937 gen1(rd1());
+
+			std::uniform_int_distribution<int> dist1(
+				BudgetbarIcon::getRangeMinX(),
+				BudgetbarIcon::getRangeMaxX() - FoodArea::getFoodAreaX()
+			);
+
+			p.x = dist1(gen1);
+
+			std::random_device rd2;
+			std::mt19937 gen2(rd2());
+
+			std::uniform_int_distribution<int> dist2(
+				BudgetbarIcon::getRangeMinY(),
+				BudgetbarIcon::getRangeMaxY() - FoodArea::getFoodAreaY()
+			);
+
+			p.y = dist2(gen2);
+			if (WaterIcon::waterAmount() < 15)
+			{
+				WaterIcon::FoodAreaList[WaterIcon::waterAmount()] = new FoodArea(this, p);
+
+				WaterIcon::FoodAreaList[WaterIcon::waterAmount()]->draw();
+
+				WaterIcon::increasewater();
+			}
+		}
+	}
+	else if (currentweather == deserted)
+	{
+		delete gameBackground;
+		gameBackground = new background(this,
+			{ 0, 2 * config.toolBarHeight },
+			config.windWidth,
+			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
+			"images\\Desert.jpg");
+	}
+	showWeatherMessage = true;
+	weatherMessageTimer->setDuration(4000);
+}
 void Game::lvlUp(){
 	if (budget >= targetBudget) {
 		level++;
@@ -378,8 +548,7 @@ void Game::createWolf()
 	gameWolves[totalcreatedwolves]->draw();
 	totalcreatedwolves++;
 	currentWolves++;
-	if(level < 13) WolfNextTimeStamp -= ((300 - 20) / (level+1));
-	else WolfNextTimeStamp -= ((300 - 20) / (13));
+	WolfNextTimeStamp -= ((300 - 20) / (level+1));
 }
 
 void Game::createWarehouse(){
@@ -534,6 +703,8 @@ void Game::saving() const{
 		}
 		if (counter >= totalcreatedmilk) { break; }
 	}
+	SaveFile << "WEATHER " << (int)currentweather << " "
+		<< weathertimer->remainingInSeconds() << "\n";
 	SaveFile.close();
 	printMessage("Game Saved!");
 }
@@ -553,71 +724,82 @@ bool Game::go()
 	int static level = 1;
 	bool isExit = false;
 	gameEnded = false;
-	isPaused = false;
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
 	pWind->DrawString(200, 200, "REAL FILE");
 	pWind->SetBuffering(true);
 	do
 	{
-
+		render();
+		lvlUp();
 		getMouseClick(x, y);
-		if (y >= 0 && y < config.toolBarHeight)
-		{
-			isExit = gameToolbar->handleClick(x, y);
+		
+		for (int i = 0; i < level * 2; i++) {
+			if (gameWolves[i]) {
+				if (gameWolves[i]->slayed(x, y)) {
+					delete gameWolves[i];
+					gameWolves[i] = nullptr;
+					currentWolves--;
+					printMessage("Wolf slayed!");
+				}
+			}
 		}
-		if (timeToRestart) { return true; }
-		if (!isPaused && !gameEnded)
-		{
-			render();
-			lvlUp();
-			for (int i = 0; i < 12; i++) {
-				if (gameWolves[i]) {
-					if (gameWolves[i]->slayed(x, y)) {
-						delete gameWolves[i];
-						gameWolves[i] = nullptr;
-						currentWolves--;
-						printMessage("Wolf slayed!");
-					}
+		for (int i = 0; i < 100; i++) {
+			if (gameEggslist[i]) {
+				gameEggslist[i]->onClick(x,y);
+				if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
+					delete gameEggslist[i];
+					gameEggslist[i] = nullptr;
+					totalcreatedeggs--;
 				}
 			}
-			for (int i = 0; i < 100; i++) {
-				if (gameEggslist[i]) {
-					gameEggslist[i]->onClick(x, y);
-					if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
-						delete gameEggslist[i];
-						gameEggslist[i] = nullptr;
-						totalcreatedeggs--;
-					}
+		}
+		for (int i = 0; i < 100; i++) {
+			if (gameMilklist[i]) {
+				gameMilklist[i]->onClick(x, y);
+				if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
+					delete gameMilklist[i];
+					gameMilklist[i] = nullptr;
+					totalcreatedmilk--;
 				}
 			}
-			for (int i = 0; i < 100; i++) {
-				if (gameMilklist[i]) {
-					gameMilklist[i]->onClick(x, y);
-					if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
-						delete gameMilklist[i];
-						gameMilklist[i] = nullptr;
-						totalcreatedmilk--;
-					}
-				}
+		}
+		if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1) {
+			createWolf();
+		}
+		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
+			if (weathertimer->check())
+			{
+				changeweather();
+				weathertimer->setDuration(60000);
 			}
-			if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1 && currentWolves < 12) {
-				createWolf();
-			}
-			if (!gameEnded && gameTimer->remaining() > 0) {
-				string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
-				printMessage(status_message);
-				string budget_string = "BUDGET = $" + to_string(budget);
-				printBudget(budget_string);
-			}
-			if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
-				gameWarehouse->onClick();
+			if (timeToRestart) { return true; }
+			//if (delay.check()) {
+			string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+			printMessage(status_message);
+			string budget_string = "BUDGET = $" + to_string(budget);
+			printBudget(budget_string);
+				//delay.setDuration(300);
+			//}
+		}
+		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+			gameWarehouse->onClick();
+		}
+		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
+		//{
+			//[1] If user clicks on the Toolbar
+		if (!ispaused) {
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
 			}
 			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
 			{
 				isExit = gameBudgetbar->handleClick(x, y);
 			}
+			//}
 		}
-		else if (isPaused) {
+		if (ispaused)
+		{
 			int centerX = config.windWidth / 2;
 			int centerY = config.windHeight / 2;
 			int width = 350;
@@ -642,7 +824,7 @@ bool Game::go()
 				isExit = gameToolbar->handleClick(x, y);
 			}
 		}
-		if (gameTimer->remaining() <= 0  && budget < targetBudget)
+		if (gameTimer->remaining() <= 0  && budget < 50000)
 		{
 			gameEnded = true;
 			{
