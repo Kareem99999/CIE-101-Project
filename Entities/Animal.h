@@ -74,11 +74,13 @@ class Wolf : public Animal
 {
 private:
 	point static wolfDimensions;
+	int clicks = 5;
 public:
 	Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void velocity();
 	int static getWolfSizeInX();
 	int static getWolfSizeInY();
 	virtual void moveStep();
-	int getremainingfood() const override ;
+	int getremainingfood() const override;
+	bool slayed(int, int);
 };

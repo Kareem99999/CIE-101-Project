@@ -6,9 +6,9 @@
 #include "../Core/GameObject.h"
 using namespace std;
 
-point Chick::chickDimensions = { 50,50 };
-point Cow::cowDimensions = { 90,60 };
-point Wolf::wolfDimensions = { 80,50 };
+point Chick::chickDimensions = {50, 50};
+point Cow::cowDimensions = {90, 60};
+point Wolf::wolfDimensions = {80, 50};
 
 Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
@@ -299,6 +299,18 @@ void Wolf::moveStep()
 	pGame->getFarm()->keepInFarm(curr_pos, curr_vel, { wolfDimensions.x, wolfDimensions.y }, 6, 4);
 	pWind->DrawImage(getImagePath(), curr_pos.x, curr_pos.y, width, height);
 }
+
 int Wolf::getremainingfood() const {
 	return -1;
+}
+
+bool Wolf::slayed(int x, int y) {
+	if (x >= RefPoint.x && x <= RefPoint.x + wolfDimensions.x && y >= RefPoint.y && y <= RefPoint.y + wolfDimensions.y) {
+		cout << "Wolf clicked!" << endl;
+		if (!--clicks) {
+			cout << "Wolf removed!" << endl;
+			return true;
+		}
+	}
+	return false;
 }
