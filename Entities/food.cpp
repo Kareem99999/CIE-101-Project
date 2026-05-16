@@ -31,7 +31,7 @@ bool Durations::checkEnd() const {
 }
 
 double Durations::remainingInSeconds() const {
-	return (std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000;
+	return -1 > ((std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000) ? -1 : ((std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000);
 }
 
 eggs::eggs(Game* r_pGame, point r_point, int r_width, int r_height)

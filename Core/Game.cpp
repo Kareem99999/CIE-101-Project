@@ -33,7 +33,7 @@ Game::Game()
 	for (int i = 0; i < 12; i++) {
 		gameWolves[i] = nullptr;
 	}
-	ispaused = false;
+	isPaused = false;
 	wolf_delay = new Timer(20 * 1000);
 
 	if (shouldLoad) {
@@ -243,7 +243,7 @@ void Game::render()
 		if (counter >= CowIcon::count) { break; }
 	}
 	counter = 0;
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 12; i++) {
 		if (gameWolves[i]) {
 			gameWolves[i]->moveStep();
 		}
@@ -378,7 +378,8 @@ void Game::createWolf()
 	gameWolves[totalcreatedwolves]->draw();
 	totalcreatedwolves++;
 	currentWolves++;
-	WolfNextTimeStamp -= ((300 - 20) / (level+1));
+	if(level < 13) WolfNextTimeStamp -= ((300 - 20) / (level+1));
+	else WolfNextTimeStamp -= ((300 - 20) / (13));
 }
 
 void Game::createWarehouse(){
@@ -552,76 +553,71 @@ bool Game::go()
 	int static level = 1;
 	bool isExit = false;
 	gameEnded = false;
+	isPaused = false;
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
 	pWind->DrawString(200, 200, "REAL FILE");
 	pWind->SetBuffering(true);
 	do
 	{
-		render();
-		lvlUp();
+
 		getMouseClick(x, y);
-		for (int i = 0; i < level * 2; i++) {
-			if (gameWolves[i]) {
-				if (gameWolves[i]->slayed(x, y)) {
-					delete gameWolves[i];
-					gameWolves[i] = nullptr;
-					currentWolves--;
-					printMessage("Wolf slayed!");
+		if (y >= 0 && y < config.toolBarHeight)
+		{
+			isExit = gameToolbar->handleClick(x, y);
+		}
+		if (timeToRestart) { return true; }
+		if (!isPaused && !gameEnded)
+		{
+			render();
+			lvlUp();
+			for (int i = 0; i < 12; i++) {
+				if (gameWolves[i]) {
+					if (gameWolves[i]->slayed(x, y)) {
+						delete gameWolves[i];
+						gameWolves[i] = nullptr;
+						currentWolves--;
+						printMessage("Wolf slayed!");
+					}
 				}
 			}
-		}
-		for (int i = 0; i < 100; i++) {
-			if (gameEggslist[i]) {
-				gameEggslist[i]->onClick(x,y);
-				if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
-					delete gameEggslist[i];
-					gameEggslist[i] = nullptr;
-					totalcreatedeggs--;
+			for (int i = 0; i < 100; i++) {
+				if (gameEggslist[i]) {
+					gameEggslist[i]->onClick(x, y);
+					if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
+						delete gameEggslist[i];
+						gameEggslist[i] = nullptr;
+						totalcreatedeggs--;
+					}
 				}
 			}
-		}
-		for (int i = 0; i < 100; i++) {
-			if (gameMilklist[i]) {
-				gameMilklist[i]->onClick(x, y);
-				if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
-					delete gameMilklist[i];
-					gameMilklist[i] = nullptr;
-					totalcreatedmilk--;
+			for (int i = 0; i < 100; i++) {
+				if (gameMilklist[i]) {
+					gameMilklist[i]->onClick(x, y);
+					if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
+						delete gameMilklist[i];
+						gameMilklist[i] = nullptr;
+						totalcreatedmilk--;
+					}
 				}
 			}
-		}
-		if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1) {
-			createWolf();
-		}
-		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
-			if (timeToRestart) { return true; }
-			//if (delay.check()) {
-			string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
-			printMessage(status_message);
-			string budget_string = "BUDGET = $" + to_string(budget);
-			printBudget(budget_string);
-				//delay.setDuration(300);
-			//}
-		}
-		if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
-			gameWarehouse->onClick();
-		}
-		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
-		//{
-			//[1] If user clicks on the Toolbar
-		if (!ispaused) {
-			if (y >= 0 && y < config.toolBarHeight)
-			{
-				isExit = gameToolbar->handleClick(x, y);
+			if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1 && currentWolves < 12) {
+				createWolf();
+			}
+			if (!gameEnded && gameTimer->remaining() > 0) {
+				string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard() + ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : " + to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+				printMessage(status_message);
+				string budget_string = "BUDGET = $" + to_string(budget);
+				printBudget(budget_string);
+			}
+			if (x >= gameWarehouse->getRefPoint().x && x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth() && y >= gameWarehouse->getRefPoint().y && y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+				gameWarehouse->onClick();
 			}
 			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
 			{
 				isExit = gameBudgetbar->handleClick(x, y);
 			}
-			//}
 		}
-		if (ispaused)
-		{
+		else if (isPaused) {
 			int centerX = config.windWidth / 2;
 			int centerY = config.windHeight / 2;
 			int width = 350;
@@ -646,7 +642,7 @@ bool Game::go()
 				isExit = gameToolbar->handleClick(x, y);
 			}
 		}
-		if (gameTimer->remaining() <= 0  && budget < 50000)
+		if (gameTimer->remaining() <= 0  && budget < targetBudget)
 		{
 			gameEnded = true;
 			{

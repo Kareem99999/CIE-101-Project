@@ -55,7 +55,7 @@ public:
 	int budget = 2000;
 	int static WolfNextTimeStamp;
 	int targetBudget = budget + 1000;
-	bool ispaused;
+	bool isPaused;
 	bool gameEnded;
 	bool timeToRestart = false;
 	static bool shouldLoad;

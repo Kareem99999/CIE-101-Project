@@ -27,11 +27,10 @@ StartIcon::StartIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 }
 void StartIcon::onClick()
 {
-	if (pGame->ispaused)
+	if (pGame->isPaused)
 	{
-		pGame->ispaused = false;
+		pGame->isPaused = false;
 		pGame->gameTimer->resume();
-		pGame->wolf_delay->resume();
 		cout << "Game is resumed" << endl;
 	}
 	
@@ -41,7 +40,7 @@ SaveIcon::SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, stri
 }
 void SaveIcon::onClick()
 {
-	pGame->saving();
+	if(!pGame->gameEnded) pGame->saving();
 }
 LoadiIcon::LoadiIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
@@ -56,9 +55,9 @@ PauseIcon::PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 }
 void PauseIcon::onClick()
 {
-	if (!pGame->ispaused) {
+	if (!pGame->isPaused) {
 		cout << "Game is paused" << endl;
-		pGame->ispaused = true;
+		pGame->isPaused = true;
 		pGame->gameTimer->paused();
 		pGame->wolf_delay->paused();
 	}
