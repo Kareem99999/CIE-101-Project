@@ -43,9 +43,8 @@ private:
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
 	Wolf* gameWolf;
-	int static level;
 	background* gameBackground;
-
+	int static level;
 public:
 	Timer* gameTimer;
 	Timer* wolf_delay;

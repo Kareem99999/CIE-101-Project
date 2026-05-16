@@ -8,6 +8,64 @@ using namespace std;
 
 bool Game::shouldLoad = false;
 int Game::level = 1;
+
+// #####################++++++++-------Timer implementations-------++++++++#####################
+TIME Timer::delay = TIMER::now();
+
+Timer::Timer(int duration) {
+	start = TIMER::now();
+	end = start + std::chrono::milliseconds(duration);
+}
+
+void Timer::setDuration(int Duration) {
+	start = TIMER::now();
+	end = start + std::chrono::milliseconds(Duration);
+	pausedTime = std::chrono::milliseconds(0);
+	isPaused = false;  // Force reset
+}
+
+bool Timer::check() const {
+	auto now = TIMER::now();
+	bool expired = (now >= end);
+	if (expired) {
+		auto remaining_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - now).count();
+		//cout << "CHECK: expired=true, remaining=" << remaining_ms << "ms, end time=" << end.time_since_epoch().count() << ", now=" << now.time_since_epoch().count() << endl;
+	}
+	return expired;
+}
+
+long long Timer::elapsed() const {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - start).count();
+}
+
+long long Timer::remaining() const {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count();
+}
+
+int Timer::remainingInSeconds() const {
+	return (std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000;
+}
+
+void Timer::paused() {
+	if (!isPaused) {
+		isPaused = true;
+		pauseStart = TIMER::now();
+	}
+}
+
+void Timer::resume() {
+	if (isPaused) {
+		isPaused = false;
+		pausedTime += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
+		end += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
+	}
+}
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^TIMER^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
 Game::Game()
 {
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
@@ -70,53 +128,6 @@ void Game::createbackground() {
 	gameBackground->draw();
 }
 
-// Timer implementations (moved here so Timer is merged with Game files)
-TIME Timer::delay = TIMER::now();
-Timer::Timer(int duration) {
-	start = TIMER::now();
-	end = start + std::chrono::milliseconds(duration);
-}
-
-void Timer::setDuration(int Duration) {
-	start = TIMER::now();
-	end = start + std::chrono::milliseconds(Duration);
-	pausedTime = std::chrono::milliseconds(0);
-	isPaused = false;  // Force reset
-}
-
-bool Timer::check() const {
-	auto now = TIMER::now();
-	bool expired = (now >= end);
-	if (expired) {
-		auto remaining_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - now).count();
-		//cout << "CHECK: expired=true, remaining=" << remaining_ms << "ms, end time=" << end.time_since_epoch().count() << ", now=" << now.time_since_epoch().count() << endl;
-	}
-	return expired;
-}
-
-long long Timer::elapsed() const {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - start).count();
-}
-
-long long Timer::remaining() const {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count();
-}
-int Timer::remainingInSeconds() const{
-	return (std::chrono::duration_cast<std::chrono::milliseconds>(end - TIMER::now()).count()) / 1000;
-}
-void Timer::paused() {
-	if (!isPaused) {
-		isPaused = true;
-		pauseStart = TIMER::now();
-	}
-}
-void Timer::resume() {
-	if (isPaused) {
-		isPaused = false;
-		pausedTime += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
-		end += std::chrono::duration_cast<std::chrono::milliseconds>(TIMER::now() - pauseStart);
-	}
-}
 Game::~Game()
 {
 	for (int i = 0; i < eggsCounter; i++) delete gameEggslist[i];
@@ -143,6 +154,7 @@ clicktype Game::getMouseClick(int& x, int& y) const
 	return pWind->GetMouseClick(x, y);	//Wait for mouse click
 
 }
+
 void Game::render()
 {
 	gameBackground->draw();
@@ -185,10 +197,13 @@ void Game::render()
 	gameToolbar->draw();
 	gameBudgetbar->draw();
 }
-void Game::lvlUp(){
+
+
+
+// #####################++++++++-------Level go up ^^ Level go down vv-------++++++++#####################
+void Game::lvlUp() {
 	if (budget >= targetBudget) {
 		level++;
-		budget = 2000 * level;
 		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
 		if (budget >= 1000) {
 			targetBudget += 1000;
@@ -202,7 +217,7 @@ void Game::lvlUp(){
 		else {
 			targetBudget += 10000;
 		}
-		restart();
+		budget += 500;
 	}
 }
 
@@ -210,6 +225,10 @@ int Game::getTarget()
 {
 	return targetBudget;
 }
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^LEVELING^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
 
 void Game::decreaseeggscount() { eggsCounter--; }
 
@@ -333,7 +352,6 @@ string Game::modifyTimerToStandard() const
 	return timer_string;
 }
 
-
 void Game::clearBudget() const
 {
 	//Clear Status bar by drawing a filled rectangle
@@ -436,7 +454,7 @@ bool Game::go()
 	bool isExit = false;
 	gameEnded = false;
 	Timer delay(100);
-	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
+	pWind->ChangeTitle(" Farm Frenzy (CIE101-project)");
 	pWind->DrawString(200, 200, "REAL FILE");
 	pWind->SetBuffering(true);
 	do
