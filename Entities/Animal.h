@@ -20,6 +20,9 @@ public:
 	//void produce(int duration);
 };
 
+// Forward declaration so classes can reference Wolf* before Wolf is defined
+class Wolf;
+
 class Chick : public Animal
 {
 private:
@@ -41,6 +44,7 @@ public:
 	void setFoodeaten(int value);
 	void Resetfoodeaten();
 	int getremainingfood() const override;
+	bool preyed(Wolf* W);
 	bool* PrevCollwithFoodArea = new bool[15];
 	bool* CurrCollwithFoodArea = new bool[15];
 };
@@ -54,6 +58,7 @@ private:
 	int foodeaten = 0;
 public:
 	Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	bool preyed(Wolf* W);
 	virtual void velocity();
 	int static getCowSizeInX();
 	int static getCowSizeInY();
@@ -77,10 +82,13 @@ private:
 	int clicks = 5;
 public:
 	Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-	virtual void velocity();
+	void velocity() override;
 	int static getWolfSizeInX();
 	int static getWolfSizeInY();
-	virtual void moveStep();
+	int getRefPointX() const;
+	int getRefPointY() const;
+	void moveStep() override;
 	int getremainingfood() const override;
 	bool slayed(int, int);
 };
+

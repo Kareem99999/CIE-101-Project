@@ -466,7 +466,28 @@ bool Game::go()
 				gameWolf = nullptr;
 				printMessage("Wolf slayed!");
 			}
+			for (int i = 0; i < ChickIcon::count; i++) {
+				if (ChickIcon::chickList[i] && ChickIcon::chickList[i]->preyed(gameWolf)) {
+					delete ChickIcon::chickList[i];
+					ChickIcon::chickList[i] = nullptr;
+					for (int j = i; j < --ChickIcon::count; j++) {
+						ChickIcon::chickList[j] = ChickIcon::chickList[j+1];
+					}
+					cout << "A chick was preyed by the wolf!" << endl;
+				}
+			}
+			for (int i = 0; i < CowIcon::count; i++) {
+				if (CowIcon::cowList[i] && CowIcon::cowList[i]->preyed(gameWolf)) {
+					delete CowIcon::cowList[i];
+					CowIcon::cowList[i] = nullptr;
+					for (int j = i; j < --CowIcon::count; j++) {
+						CowIcon::cowList[j] = CowIcon::cowList[j + 1];
+					}
+					cout << "A cow was preyed by the wolf!" << endl;
+				}
+			}
 		}
+
 
 		for (int i = 0; i < totalcreatedeggs; i++) {
 			if (gameEggslist[i]) {

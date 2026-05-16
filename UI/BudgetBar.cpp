@@ -123,7 +123,7 @@ void ChickIcon::onClick()
 	*/
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
 	cout << "Icon Chick Clicked" << endl;
-	if (pGame->budget > cost) {
+	if (pGame->budget >= cost) {
 		pGame->budget -= cost;
 		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
@@ -163,7 +163,7 @@ void ChickIcon::onClick()
 void CowIcon::onClick()
 {
 	cout << "Icon Cow Clicked" << endl;
-	if (pGame->budget > cost) {
+	if (pGame->budget >= cost) {
 		pGame->budget = pGame->budget - cost;
 		BudgetbarIcon::increaseAnimals();
 		pGame->clearBudget();
@@ -326,9 +326,9 @@ bool Budgetbar::handleClick(int x, int y)
 
 }
 
-// Water thingies
-
-WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
+// ####################++++++++++----------Water thingies----------++++++++++####################
+WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
+	: BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
 	FoodAreaList = new FoodArea * [15];
 	for (int i = 0; i < 15; i++) {

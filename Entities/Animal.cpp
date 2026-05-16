@@ -161,6 +161,14 @@ int Chick::getremainingfood() const {
 	return needed - this->foodeaten;
 }
 
+bool Chick::preyed(Wolf* W) {
+	if (RefPoint.x + chickDimensions.x >= W->getRefPointX() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
+		&& RefPoint.y + chickDimensions.y >= W->getRefPointY() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()) {
+		return true;
+	}
+	return false;
+}
+
 
 
 
@@ -261,6 +269,14 @@ int Cow::getremainingfood()const {
 	return needed - this->foodeaten;
 }
 
+bool Cow::preyed(Wolf* W)
+{
+	if (RefPoint.x + cowDimensions.x >= W->getRefPointX() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
+		&& RefPoint.y + cowDimensions.y >= W->getRefPointY() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()) {
+		return true;
+	}
+	return false;
+}
 
 
 
@@ -288,6 +304,16 @@ int Wolf::getWolfSizeInX()
 int Wolf::getWolfSizeInY()
 {
 	return wolfDimensions.y;
+}
+
+int Wolf::getRefPointX() const
+{
+	return RefPoint.x;
+}
+
+int Wolf::getRefPointY() const
+{
+	return RefPoint.y;
 }
 
 void Wolf::moveStep()
