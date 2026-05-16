@@ -500,13 +500,13 @@ bool Game::go()
 			}
 		}
 		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
-			if (level == 1) {
-				if (wolf_delay->check())
-				{
-					createWolf();
-
-					wolf_delay->setDuration(60 * 1000);
-				}
+			if (wolf_delay->check())
+			{
+				createWolf();
+				if (level < 10)
+					wolf_delay->setDuration(120 - (level * 20) * 1000);
+				else
+					wolf_delay->setDuration(20 * 1000);
 			}
 			if (timeToRestart) { return true; }
 			if (delay.check()) {
