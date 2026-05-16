@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "Animal.h"
 #include "food.h"
 #include "../Config/GameConfig.h"
@@ -73,6 +74,7 @@ Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img
 		PrevCollwithFoodArea[i] = false;
 		CurrCollwithFoodArea[i] = false;
 	}
+	velocity();
 }
 
 void Chick::velocity()
@@ -122,7 +124,7 @@ void Chick::ifColl() {
 			}
 		}
 	}
-};
+}
 
 bool Chick::getPrevColl() const
 {
@@ -180,6 +182,7 @@ Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_pat
 		PrevCollwithFoodArea[i] = false;
 		CurrCollwithFoodArea[i] = false;
 	}
+	velocity();
 }
 
 void Cow::velocity()
@@ -207,7 +210,6 @@ void Cow::moveStep()
 	curr_pos.y += curr_vel.y;
 	RefPoint = curr_pos;
 	pGame->getFarm()->keepInFarm(curr_pos, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
-	pWind->DrawImage(getImagePath(), curr_pos.x, curr_pos.y, width, height);
 	draw();
 
 }
@@ -285,6 +287,7 @@ Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_p
 	: Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
 	cout << "wolf constructor" << endl;
+	velocity();
 }
 
 void Wolf::velocity()
@@ -338,4 +341,16 @@ bool Wolf::slayed(int x, int y) {
 		}
 	}
 	return false;
+}
+
+void Wolf::Saving(ofstream& saveFile) const
+{
+	saveFile << "Wolf " << RefPoint.x << " " << RefPoint.y << " " << curr_vel.x << " " << curr_vel.y << " " << clicks << endl;
+}
+
+void Wolf::Loading(int velcX, int velcY, int _clicks)
+{
+	curr_vel.x = velcX;
+	curr_vel.y = velcY;
+	clicks = clicks;
 }

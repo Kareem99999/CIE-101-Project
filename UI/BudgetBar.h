@@ -1,10 +1,10 @@
 #pragma once
-#include <limits>
-#include <random>
 #include "../Core/Drawable.h"
 #include "../Core/Gameobject.h"
-#include "../Config/GameConfig.h"
 #include "../Entities/Animal.h"
+#include "../Config/GameConfig.h"
+#include <random>
+#include <limits>
 
 //Base class for all toolbar icons 
 class BudgetbarIcon :public Drawable
@@ -44,6 +44,7 @@ public:
 	static int count;
 	static int cost;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	void changeChickCount(int value);
 	virtual void onClick();
 	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;
@@ -56,7 +57,8 @@ public:
 	static Cow** cowList;
 	static int count;
 	static int cost;
-	CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	void changeCowCount(int value);
 	virtual void onClick();
 	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;
@@ -105,7 +107,8 @@ public:
 	static FoodArea** FoodAreaList;
 	virtual void onClick();
 	int static waterAmount();
-	void decreaseWater();
+	void static decreaseWater();
+	static void increasewater();
 	virtual void Saving(ofstream& saveFile) const;
 	virtual void Loading(ifstream& loadFile) const;
 };

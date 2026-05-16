@@ -43,7 +43,9 @@ protected:
 	int WarehouseWidth = 0;
 	int WarehouseHeight = 0;
 	std::string image_path;
+	int static storageLimit;
 public:
+	int static getStorageLimit();
 	Warehouse(Game * r_pGame, point ref, int r_width, int r_height, string img_path);
 	void draw() const override;
 	void onClick();

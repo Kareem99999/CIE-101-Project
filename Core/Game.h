@@ -1,13 +1,18 @@
 #pragma once
-#include <chrono>
 #include "../CMUgraphicsLib/CMUgraphics.h"
-#include "../Core/GameObject.h"
-#include "../Entities/food.h"
-#include "../UI/BudgetBar.h"
 #include "../UI/Toolbar.h"
+#include "../UI/BudgetBar.h"
+#include "../Entities/food.h"
+#include <chrono>
+#include "../Core/GameObject.h"
+#include <random>
 using TIMER = std::chrono::steady_clock;
 using TIME = TIMER::time_point;
-
+enum weathertype {
+	sunny,
+	deserted,
+	rainy
+};
 class Timer {
 private:
 	TIME start = TIME();
@@ -36,21 +41,29 @@ private:
 	Budgetbar* gameBudgetbar;
 	Farm* gameFarm;
 	Warehouse* gameWarehouse;
-	eggs** gameEggslist = new eggs* [100];
+	eggs** gameEggslist;
 	int eggsCounter = 0;
 	int totalcreatedeggs = 0;
-	milk** gameMilklist = new milk*[100];
+	milk** gameMilklist;
 	int milkCounter = 0;
 	int totalcreatedmilk = 0;
-	Wolf* gameWolf;
-	background* gameBackground;
+	Wolf** gameWolves;
 	int static level;
+	background* gameBackground;
+	int totalcreatedwolves = 0;
+	int currentWolves = 0;
+	weathertype currentweather;
+	Timer* weathertimer;
+	Timer* weatherMessageTimer;
+	bool showWeatherMessage = false;
+
 public:
 	Timer* gameTimer;
 	Timer* wolf_delay;
 	int budget = 2000;
+	int static WolfNextTimeStamp;
 	int targetBudget = budget + 1000;
-	bool ispaused;
+	bool isPaused;
 	bool gameEnded;
 	bool timeToRestart = false;
 	static bool shouldLoad;
@@ -75,12 +88,14 @@ public:
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	void createFarm();
-	void redrawFarm() const;
+	//void redrawFarm() const;
 	void createWarehouse();
 	int getEggcount();
 	int getMilkcount();
 	void changeEggcount();
 	void changeMilkcount();
+	void createEgg(Chick* chick);
+	void createMilk(Cow* cow);
 	Farm* getFarm() const;
 	void decreasemilkcount();
 	void decreaseeggscount();
@@ -90,7 +105,9 @@ public:
 	void restart();
 	void createbackground();
 	void render();
-
+	weathertype getCurrentWeather() const;
+	void changeweather();
+	void applyWeather(weathertype);
 	window* getWind() const;		//returns pointer to the graphics window
 };
 

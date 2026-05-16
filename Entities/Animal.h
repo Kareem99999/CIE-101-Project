@@ -90,5 +90,7 @@ public:
 	void moveStep() override;
 	int getremainingfood() const override;
 	bool slayed(int, int);
+	void Saving(ofstream& saveFile) const;
+	void Loading(int velcX, int velcY, int _clicks);
 };
 
