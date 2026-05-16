@@ -162,11 +162,11 @@ int Chick::getremainingfood() const {
 }
 
 bool Chick::preyed(Wolf* W) {
-	if (RefPoint.x + chickDimensions.x >= W->getRefPointX() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
-		&& RefPoint.y + chickDimensions.y >= W->getRefPointY() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()) {
-		return true;
-	}
-	return false;
+	if (!W) return false;
+	return (RefPoint.x + chickDimensions.x >= W->getRefPointX()
+		&& RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
+		&& RefPoint.y + chickDimensions.y >= W->getRefPointY()
+		&& RefPoint.y <= W->getRefPointY() + W->getWolfSizeInY());
 }
 
 
@@ -263,19 +263,18 @@ void Cow::Resetfoodeaten()
 	foodeaten = 0;
 }
 
-int Cow::getremainingfood()const {
+int Cow::getremainingfood() const {
 	int needed = 4;
 	if (this->foodeaten == 0) return needed;
 	return needed - this->foodeaten;
 }
 
-bool Cow::preyed(Wolf* W)
-{
-	if (RefPoint.x + cowDimensions.x >= W->getRefPointX() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
-		&& RefPoint.y + cowDimensions.y >= W->getRefPointY() && RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()) {
-		return true;
-	}
-	return false;
+bool Cow::preyed(Wolf* W) {
+	if (!W) return false;
+	return (RefPoint.x + cowDimensions.x >= W->getRefPointX()
+		&& RefPoint.x <= W->getRefPointX() + W->getWolfSizeInX()
+		&& RefPoint.y + cowDimensions.y >= W->getRefPointY()
+		&& RefPoint.y <= W->getRefPointY() + W->getWolfSizeInY());
 }
 
 
@@ -285,7 +284,7 @@ bool Cow::preyed(Wolf* W)
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
-	cout << "wolf contructor";
+	cout << "wolf constructor" << endl;
 }
 
 void Wolf::velocity()

@@ -296,7 +296,10 @@ void Game::redrawFarm() const
 
 void Game::createWolf()
 {
-	if (gameWolf != nullptr) return;
+	if (gameWolf != nullptr) {
+		cout << "No wolves for you bih" << endl;
+		return;
+	}
 	point p;
 	std::random_device rd1;
 	std::mt19937 gen1(rd1());
@@ -308,6 +311,7 @@ void Game::createWolf()
 	p.y = dist2(gen2);
 	gameWolf = new Wolf(this, p, Wolf::getWolfSizeInX(),Wolf::getWolfSizeInY(), "images\\wolf.jpg");
 	gameWolf->draw();
+	cout << "A wolf has appeared!" << endl;
 }
 
 void Game::createWarehouse(){
@@ -461,11 +465,6 @@ bool Game::go()
 		getMouseClick(x, y);
 
 		if (gameWolf) {
-			if (gameWolf->slayed(x, y)) {
-				delete gameWolf;
-				gameWolf = nullptr;
-				printMessage("Wolf slayed!");
-			}
 			for (int i = 0; i < ChickIcon::count; i++) {
 				if (ChickIcon::chickList[i] && ChickIcon::chickList[i]->preyed(gameWolf)) {
 					delete ChickIcon::chickList[i];
@@ -485,6 +484,11 @@ bool Game::go()
 					}
 					cout << "A cow was preyed by the wolf!" << endl;
 				}
+			}
+			if (gameWolf->slayed(x, y)) {
+				delete gameWolf;
+				gameWolf = nullptr;
+				printMessage("Wolf slayed!");
 			}
 		}
 
