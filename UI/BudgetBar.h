@@ -108,6 +108,7 @@ public:
 	virtual void onClick();
 	int static waterAmount();
 	void static decreaseWater();
+	static void increasewater();
 	virtual void Saving(ofstream& saveFile) const;
 	virtual void Loading(ifstream& loadFile) const;
 };

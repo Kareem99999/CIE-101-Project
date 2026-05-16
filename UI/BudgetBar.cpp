@@ -354,6 +354,10 @@ bool Budgetbar::handleClick(int x, int y)
 }
 
 // Water thingies
+void WaterIcon::increasewater()
+{
+	amount++;
+}
 
 WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
@@ -413,37 +417,47 @@ void WaterIcon::decreaseWater()
 
 void WaterIcon::onClick()
 {
+	int watercost = 20;
 	cout << "Icon Water Clicked" << endl;
-	if (pGame->budget >= cost && amount < 50) {
-		pGame->budget -= cost;
+	// cost 20
+	if (pGame->getCurrentWeather() == deserted)
+	{
+		watercost *= 2;
+	}
+	if (pGame->budget >= watercost) {
+		pGame->budget -= watercost;
+		cout << "Icon Water Clicked" << endl;
+		if (pGame->budget >= cost && amount < 50) {
+			pGame->budget -= cost;
 
-		point p;
-		std::random_device rd1;
-		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(range_min_x, (range_max_x - FoodArea::getFoodAreaX()));
-		p.x = dist1(gen1);
-		std::random_device rd2;
-		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(range_min_y, (range_max_y - FoodArea::getFoodAreaY()));
-		p.y = dist2(gen2);
-		for (int i = 0; i < 50; i++) {
-			if (!FoodAreaList[i]) {
-				FoodAreaList[amount] = new FoodArea(pGame, p);
-				FoodAreaList[amount]->draw();
-				amount++;
-				break;
+			point p;
+			std::random_device rd1;
+			std::mt19937 gen1(rd1());
+			std::uniform_int_distribution<int> dist1(range_min_x, (range_max_x - FoodArea::getFoodAreaX()));
+			p.x = dist1(gen1);
+			std::random_device rd2;
+			std::mt19937 gen2(rd2());
+			std::uniform_int_distribution<int> dist2(range_min_y, (range_max_y - FoodArea::getFoodAreaY()));
+			p.y = dist2(gen2);
+			for (int i = 0; i < 50; i++) {
+				if (!FoodAreaList[i]) {
+					FoodAreaList[amount] = new FoodArea(pGame, p);
+					FoodAreaList[amount]->draw();
+					amount++;
+					break;
+				}
 			}
+			pGame->clearBudget();
+			string budget_string = "BUDGET = $" + to_string(pGame->budget);
+			pGame->printBudget(budget_string);
+			string msg = "Water amount = " + to_string(amount);
+			cout << msg << endl;
 		}
-		pGame->clearBudget();
-		string budget_string = "BUDGET = $" + to_string(pGame->budget);
-		pGame->printBudget(budget_string);
-		string msg = "Water amount = " + to_string(amount);
-		cout << msg << endl;
-	}
-	else if (amount >= 50) {
-		pGame->printMessage("You have reached the maximum number of food areas!");
-	}
-	else {
-		pGame->printMessage("Not enough budget to buy a food area!");
+		else if (amount >= 50) {
+			pGame->printMessage("You have reached the maximum number of food areas!");
+		}
+		else {
+			pGame->printMessage("Not enough budget to buy a food area!");
+		}
 	}
 }
