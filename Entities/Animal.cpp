@@ -341,6 +341,7 @@ bool Wolf::slayed(int x, int y) {
 		cout << "Wolf clicked!" << endl;
 		if (!--clicks) {
 			cout << "Wolf removed!" << endl;
+			pGame->wolf_removed();
 			return true;
 		}
 	}
