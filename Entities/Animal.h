@@ -45,8 +45,8 @@ public:
 	void Resetfoodeaten();
 	int getremainingfood() const override;
 	bool preyed(Wolf* W);
-	bool* PrevCollwithFoodArea = new bool[15];
-	bool* CurrCollwithFoodArea = new bool[15];
+	bool* PrevCollwithFoodArea = new bool[50];
+	bool* CurrCollwithFoodArea = new bool[50];
 };
 
 class Cow : public Animal
@@ -71,8 +71,8 @@ public:
 	void setFoodeaten(int value);
 	void Resetfoodeaten();
 	int getremainingfood() const override;
-	bool* PrevCollwithFoodArea = new bool[15];
-	bool* CurrCollwithFoodArea = new bool[15];
+	bool* PrevCollwithFoodArea = new bool[50];
+	bool* CurrCollwithFoodArea = new bool[50];
 };
 
 class Wolf : public Animal

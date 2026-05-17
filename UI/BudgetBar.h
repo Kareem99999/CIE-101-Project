@@ -44,7 +44,7 @@ public:
 	static int count;
 	static int cost;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-	void changeChickCount(int value);
+	void static changeChickCount(int value);
 	virtual void onClick();
 	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;
@@ -58,7 +58,7 @@ public:
 	static int count;
 	static int cost;
 	CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-	void changeCowCount(int value);
+	void static changeCowCount(int value);
 	virtual void onClick();
 	virtual void setIconProperties() override;
 	virtual void Saving(ofstream& saveFile) const;

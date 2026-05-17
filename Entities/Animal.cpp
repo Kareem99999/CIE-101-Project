@@ -70,7 +70,7 @@ string Animal::getImagePath() const
 
 Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < 50; i++) {
 		PrevCollwithFoodArea[i] = false;
 		CurrCollwithFoodArea[i] = false;
 	}
@@ -102,14 +102,15 @@ void Chick::moveStep()
 	curr_pos.y += curr_vel.y;
 	RefPoint = curr_pos;
 	pGame->getFarm()->keepInFarm(curr_pos, curr_vel, { chickDimensions.x, chickDimensions.y }, 9, 7);
-	pWind->DrawImage(getImagePath(), curr_pos.x, curr_pos.y, width, height);
 	draw();
 }
 
 void Chick::ifColl() {
-	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
+	int counter = 0;
+	for (int i = 0; i < 50; i++) {
 		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
 		if (WaterIcon::FoodAreaList[i] != nullptr) {
+			counter++;
 			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
 			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
 			point FoodAref = FoodA->getFoodAreaRef();
@@ -123,6 +124,7 @@ void Chick::ifColl() {
 				foodeaten += 1;
 			}
 		}
+		if (counter >= WaterIcon::waterAmount()) { break; }
 	}
 }
 
@@ -178,7 +180,7 @@ bool Chick::preyed(Wolf* W) {
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < 50; i++) {
 		PrevCollwithFoodArea[i] = false;
 		CurrCollwithFoodArea[i] = false;
 	}
@@ -209,15 +211,16 @@ void Cow::moveStep()
 	curr_pos.x += curr_vel.x;
 	curr_pos.y += curr_vel.y;
 	RefPoint = curr_pos;
-	pGame->getFarm()->keepInFarm(curr_pos, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
 	draw();
 
 }
 
 void Cow::ifColl() {
-	for (int i = 0; i < WaterIcon::waterAmount(); i++) {
+	int counter = 0;
+	for (int i = 0; i < 50; i++) {
 		PrevCollwithFoodArea[i] = CurrCollwithFoodArea[i];
 		if (WaterIcon::FoodAreaList[i] != nullptr) {
+			counter++;
 			FoodArea* FoodA = WaterIcon::FoodAreaList[i];
 			point FoodAsize = { FoodA->getFoodAreaX(), FoodA->getFoodAreaY() };
 			point FoodAref = FoodA->getFoodAreaRef();
@@ -231,6 +234,7 @@ void Cow::ifColl() {
 				foodeaten += 1;
 			}
 		}
+		if (counter >= WaterIcon::waterAmount()) { break; }
 	}
 }
 
