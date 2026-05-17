@@ -40,6 +40,7 @@ eggs::eggs(Game* r_pGame, point r_point, int r_width, int r_height)
 	sellprice = 50;
 	amount = 0;
 	appearingTimer = new Durations(8 * 1000);
+	enableDrawing = true;
 }
 void eggs::addFood(int amount)
 {
@@ -87,6 +88,7 @@ milk::milk(Game* r_pGame, point r_point, int r_width, int r_height)
 	sellprice = 500;
 	amount = 0;
 	appearingTimer = new Durations(8 * 1000);
+	enableDrawing = true;
 }
 
 void milk::onClick(int posX, int posY)
