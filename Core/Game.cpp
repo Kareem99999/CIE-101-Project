@@ -122,7 +122,7 @@ Game::Game()
 	for (int i = 0; i < 12; i++) {
 		gameWolves[i] = nullptr;
 	}
-	ispaused = false;
+	isPaused = false;
 	wolf_delay = new Timer(20 * 1000);
 
 	if (shouldLoad) {
@@ -398,6 +398,7 @@ void Game::changeweather()
 
 	if (currentweather == sunny)
 	{
+		WaterIcon::cost = 20;
 		delete gameBackground;
 		gameBackground = new background(this,
 			{ 0, 2 * config.toolBarHeight },
@@ -407,6 +408,7 @@ void Game::changeweather()
 	}
 	else if (currentweather == rainy)
 	{
+		WaterIcon::cost = 20;
 		delete gameBackground;
 
 		gameBackground = new background(this,
@@ -439,7 +441,7 @@ void Game::changeweather()
 			);
 
 			p.y = dist2(gen2);
-			if (WaterIcon::waterAmount() < 15)
+			if (WaterIcon::waterAmount() < 50)
 			{
 				WaterIcon::FoodAreaList[WaterIcon::waterAmount()] = new FoodArea(this, p);
 
@@ -451,6 +453,7 @@ void Game::changeweather()
 	}
 	else if (currentweather == deserted)
 	{
+		WaterIcon::cost = 60;
 		delete gameBackground;
 		gameBackground = new background(this,
 			{ 0, 2 * config.toolBarHeight },
@@ -748,70 +751,74 @@ bool Game::go()
 	pWind->SetBuffering(true);
 	do
 	{
-		render();
-		lvlUp();
 		getMouseClick(x, y);
-		
-		for (int i = 0; i < currentWolves; i++) {
-			if (gameWolves[i]) {
-				for (int j = 0; j < ChickIcon::count; j++) {
-					if (ChickIcon::chickList[j] && ChickIcon::chickList[j]->preyed(gameWolves[i])) {
-						delete ChickIcon::chickList[j];
-						ChickIcon::chickList[j] = nullptr;
-						for (int k = j; k < --ChickIcon::count; k++) {
-							ChickIcon::chickList[k] = ChickIcon::chickList[k + 1];
+		if (y >= 0 && y < config.toolBarHeight)
+		{
+			isExit = gameToolbar->handleClick(x, y);
+		}
+		if (timeToRestart) { return true; }
+		if (!isPaused && !gameEnded && gameTimer->remaining() > 0) {
+			render();
+			lvlUp();
+
+			for (int i = 0; i < currentWolves; i++) {
+				if (gameWolves[i]) {
+					for (int j = 0; j < ChickIcon::count; j++) {
+						if (ChickIcon::chickList[j] && ChickIcon::chickList[j]->preyed(gameWolves[i])) {
+							delete ChickIcon::chickList[j];
+							ChickIcon::chickList[j] = nullptr;
+							for (int k = j; k < --ChickIcon::count; k++) {
+								ChickIcon::chickList[k] = ChickIcon::chickList[k + 1];
+							}
+							cout << "A chick was preyed by the wolf!" << endl;
 						}
-						cout << "A chick was preyed by the wolf!" << endl;
+					}
+					for (int j = 0; j < CowIcon::count; j++) {
+						if (CowIcon::cowList[j] && CowIcon::cowList[j]->preyed(gameWolves[i])) {
+							delete CowIcon::cowList[j];
+							CowIcon::cowList[j] = nullptr;
+							for (int k = j; k < --CowIcon::count; k++) {
+								CowIcon::cowList[k] = CowIcon::cowList[k + 1];
+							}
+							cout << "A cow was preyed by the wolf!" << endl;
+						}
+					}
+					if (gameWolves[i]->slayed(x, y)) {
+						delete gameWolves[i];
+						gameWolves[i] = nullptr;
+						currentWolves--;
+						printMessage("Wolf slayed!");
 					}
 				}
-				for (int j = 0; j < CowIcon::count; j++) {
-					if (CowIcon::cowList[j] && CowIcon::cowList[j]->preyed(gameWolves[i])) {
-						delete CowIcon::cowList[j];
-						CowIcon::cowList[j] = nullptr;
-						for (int k = j; k < --CowIcon::count; k++) {
-							CowIcon::cowList[k] = CowIcon::cowList[k + 1];
-						}
-						cout << "A cow was preyed by the wolf!" << endl;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (gameEggslist[i]) {
+					gameEggslist[i]->onClick(x, y);
+					if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
+						delete gameEggslist[i];
+						gameEggslist[i] = nullptr;
+						totalcreatedeggs--;
 					}
 				}
-				if (gameWolves[i]->slayed(x, y)) {
-					delete gameWolves[i];
-					gameWolves[i] = nullptr;
-					currentWolves--;
-					printMessage("Wolf slayed!");
+			}
+			for (int i = 0; i < 100; i++) {
+				if (gameMilklist[i]) {
+					gameMilklist[i]->onClick(x, y);
+					if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
+						delete gameMilklist[i];
+						gameMilklist[i] = nullptr;
+						totalcreatedmilk--;
+					}
 				}
 			}
-		}
-		for (int i = 0; i < 100; i++) {
-			if (gameEggslist[i]) {
-				gameEggslist[i]->onClick(x,y);
-				if (gameEggslist[i]->appearingTimer->checkEnd() && gameEggslist[i]->isEnableDrawing()) {
-					delete gameEggslist[i];
-					gameEggslist[i] = nullptr;
-					totalcreatedeggs--;
-				}
+			if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1) {
+				createWolf();
 			}
-		}
-		for (int i = 0; i < 100; i++) {
-			if (gameMilklist[i]) {
-				gameMilklist[i]->onClick(x, y);
-				if (gameMilklist[i]->appearingTimer->checkEnd() && gameMilklist[i]->isEnableDrawing()) {
-					delete gameMilklist[i];
-					gameMilklist[i] = nullptr;
-					totalcreatedmilk--;
-				}
-			}
-		}
-		if (WolfNextTimeStamp >= gameTimer->remainingInSeconds() && currentWolves < level + 1) {
-			createWolf();
-		}
-		if (!ispaused && !gameEnded && gameTimer->remaining() > 0) {
 			if (weathertimer->check())
 			{
 				changeweather();
 				weathertimer->setDuration(60000);
 			}
-			if (timeToRestart) { return true; }
 			//if (delay.check()) {
 			string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard()
 				+ ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : "
@@ -821,28 +828,19 @@ bool Game::go()
 			printBudget(budget_string);
 				//delay.setDuration(300);
 			//}
-		}
-		if (x >= gameWarehouse->getRefPoint().x
-			&& x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth()
-			&& y >= gameWarehouse->getRefPoint().y
-			&& y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
-			gameWarehouse->onClick();
-		}
-		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
-		//{
-			//[1] If user clicks on the Toolbar
-		if (!ispaused) {
-			if (y >= 0 && y < config.toolBarHeight)
-			{
-				isExit = gameToolbar->handleClick(x, y);
+			if (x >= gameWarehouse->getRefPoint().x
+				&& x <= gameWarehouse->getRefPoint().x + gameWarehouse->getWarehouseWidth()
+				&& y >= gameWarehouse->getRefPoint().y
+				&& y <= gameWarehouse->getRefPoint().y + gameWarehouse->getWarehouseWidth()) {
+				gameWarehouse->onClick();
 			}
 			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
 			{
 				isExit = gameBudgetbar->handleClick(x, y);
 			}
-			//}
 		}
-		if (ispaused)
+		
+		else if (isPaused)
 		{
 			int centerX = config.windWidth / 2;
 			int centerY = config.windHeight / 2;
