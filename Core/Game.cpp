@@ -762,9 +762,9 @@ bool Game::go()
 			render();
 			lvlUp();
 
-			for (int i = 0; i < currentWolves; i++) {
+			for (int i = 0; i < 12; i++) {
 				if (gameWolves[i]) {
-					for (int j = 0; j < ChickIcon::count; j++) {
+					for (int j = 0; j < 15; j++) {
 						if (ChickIcon::chickList[j] && ChickIcon::chickList[j]->preyed(gameWolves[i])) {
 							delete ChickIcon::chickList[j];
 							ChickIcon::chickList[j] = nullptr;
@@ -774,7 +774,7 @@ bool Game::go()
 							cout << "A chick was preyed by the wolf!" << endl;
 						}
 					}
-					for (int j = 0; j < CowIcon::count; j++) {
+					for (int j = 0; j < 15; j++) {
 						if (CowIcon::cowList[j] && CowIcon::cowList[j]->preyed(gameWolves[i])) {
 							delete CowIcon::cowList[j];
 							CowIcon::cowList[j] = nullptr;

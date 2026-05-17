@@ -370,6 +370,7 @@ WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 		FoodAreaList[i] = nullptr;
 	}
 	amount = 0;
+	WaterIcon::cost = 20;
 }
 
 void WaterIcon::increasewater()
@@ -427,15 +428,6 @@ void WaterIcon::decreaseWater()
 
 void WaterIcon::onClick()
 {
-	int watercost = 20;
-	cout << "Icon Water Clicked" << endl;
-	// cost 20
-	if (pGame->getCurrentWeather() == deserted)
-	{
-		watercost *= 2;
-	}
-	if (pGame->budget >= watercost) {
-		pGame->budget -= watercost;
 		cout << "Icon Water Clicked" << endl;
 		if (pGame->budget >= cost && amount < 50) {
 			pGame->budget -= cost;
@@ -469,5 +461,4 @@ void WaterIcon::onClick()
 		else {
 			pGame->printMessage("Not enough budget to buy a food area!");
 		}
-	}
 }

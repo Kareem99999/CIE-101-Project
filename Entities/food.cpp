@@ -93,7 +93,7 @@ milk::milk(Game* r_pGame, point r_point, int r_width, int r_height)
 
 void milk::onClick(int posX, int posY)
 {
-	if (posX >= RefPoint.x && posX <= RefPoint.x + 20 && posY >= RefPoint.y && posY <= RefPoint.y + 20 && enableDrawing 
+	if (posX >= RefPoint.x && posX <= RefPoint.x + 20 && posY >= RefPoint.y && posY <= RefPoint.y + 20 && enableDrawing
 		&& (pGame->getEggcount() + pGame->getMilkcount()) < Warehouse::getStorageLimit())
 	{
 		enableDrawing = false;
@@ -108,7 +108,7 @@ void milk:: draw() const
 {
 	if (!enableDrawing) return;
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(foodImagePath, RefPoint.x + Cow::getCowSizeInX(), RefPoint.y, width, height);
+	pWind->DrawImage(foodImagePath, RefPoint.x, RefPoint.y, width, height);
 }
 int milk::getsellPrice()
 {
