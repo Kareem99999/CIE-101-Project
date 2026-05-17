@@ -13,6 +13,12 @@ enum weathertype {
 	deserted,
 	rainy
 };
+struct achievement
+{
+	string name;
+	bool unlocked;
+	int reward;
+};
 class Timer {
 private:
 	TIME start = TIME();
@@ -32,10 +38,15 @@ public:
 	void paused();
 	void resume();
 };
-
 class Game
 {
 private:
+	struct Notification
+	{
+		string message;
+		bool active;
+		Timer* timer;
+	};
 	window* pWind;	//Pointer to the CMU graphics window
 	Toolbar* gameToolbar;
 	Budgetbar* gameBudgetbar;
@@ -52,6 +63,8 @@ private:
 	background* gameBackground;
 	int totalcreatedwolves = 0;
 	int currentWolves = 0;
+	bool survivedDesertification = false;
+
 	weathertype currentweather;
 	Timer* weathertimer;
 	Timer* weatherMessageTimer;
@@ -60,13 +73,18 @@ private:
 public:
 	Timer* gameTimer;
 	Timer* wolf_delay;
-	int budget = 2000;
+	int budget = 500;
+	int timeBonusScore = 0;
+	int score_level_addition = 300;
 	int static WolfNextTimeStamp;
-	int targetBudget = budget + 1000;
+	int targetBudget = budget + 500;
 	bool isPaused;
 	bool gameEnded;
 	bool timeToRestart = false;
 	static bool shouldLoad;
+	bool wolf_isremoved = false;
+	int score = 0;
+	Notification achievementNotification;
 	Game();
 	~Game();
 
@@ -109,5 +127,10 @@ public:
 	void changeweather();
 	void applyWeather(weathertype);
 	window* getWind() const;		//returns pointer to the graphics window
+	achievement achievements[10];
+	void unlockAchievement(int index)  ;
+	void checkacheivement();
+	void wolf_removed();
+	void drawAchievementPopup();
 };
 

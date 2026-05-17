@@ -71,7 +71,14 @@ void Timer::resume() {
 void Game::lvlUp() {
 	if (budget >= targetBudget) {
 		level++;
+		score += score_level_addition;
+		score_level_addition += 100;
 		printMessage("Target budget reached! Level up: " + std::to_string(targetBudget));
+		int remaining = gameTimer->remainingInSeconds();
+		timeBonusScore = remaining * 10;
+		score += timeBonusScore;
+		string bonusMessage = "Time Bonus: +" + to_string(timeBonusScore) + " Score!";
+		printMessage(bonusMessage);
 		if (budget >= 1000) {
 			targetBudget += 1000;
 		}
@@ -108,6 +115,18 @@ Game::Game()
 	createFarm();
 	clearStatusBar();
 	createTimer();
+	achievements[0] = { "First Egg", false, 50 };
+	achievements[1] = { "Milk Collector", false, 100 };
+	achievements[2] = { "Rich Farmer", false, 300 };
+	achievements[3] = { "Animal Kingdom", false, 200 };
+	achievements[4] = { "Wolf Hunter", false, 150 };
+	achievements[5] = { "Egg Master", false, 250 };
+	achievements[6] = { "Milk Empire", false, 350 };
+	achievements[7] = { "Level 3", false, 200 };
+	achievements[8] = { "Water Saver", false, 100 };
+	achievements[9] = { "Survived Desertification", false, 300 };
+	achievementNotification.active = false;
+	achievementNotification.timer = new Timer(0);
 	weatherMessageTimer = new Timer(0);
 	currentweather = sunny;
 	weathertimer = new Timer(2000);
@@ -172,7 +191,7 @@ Game::Game()
 				if (!enable) milkCounter++;
 				string weatherKey;
 				int weatherValue;
-			}	
+			}
 			string weatherKey;
 			int weatherValue;
 			int weatherRemaining;
@@ -183,9 +202,22 @@ Game::Game()
 			weathertimer->setDuration(weatherRemaining * 1000);
 			loadedWeather = true;
 			applyWeather(currentweather);
+			string scorekey;
+			int scoreValue;
+			SaveFile >> scorekey >> scoreValue;
+			if (scorekey == "SCORE") {
+				score = scoreValue;
+			}
+			string achKey;
+			SaveFile >> achKey;
+			if (achKey == "ACHIEVEMENTS") {
+				for (int i = 0; i < 10; i++) {
+					SaveFile >> achievements[i].unlocked;
+				}
+			}
+			SaveFile.close();
+			printMessage("Game Loaded!");
 		}
-		SaveFile.close();
-		printMessage("Game Loaded!");
 	}
 }
 void Game::createbackground() {
@@ -222,6 +254,8 @@ Game::~Game()
 	totalcreatedmilk = 0;
 	delete weathertimer;
 	delete weatherMessageTimer;
+	delete achievementNotification.timer;
+	achievementNotification.timer = nullptr;
 	WolfNextTimeStamp = 300 - 20;
 }
 
@@ -316,20 +350,12 @@ void Game::render()
 		else
 		{
 			int centerX = config.windWidth / 2;
-			int topY = 140;
+			int topY = 160;
 
 			pWind->SetPen(BLACK, 2);
 			pWind->SetBrush(color(240, 240, 240));
 
-			pWind->DrawRectangle(
-				centerX - 220,
-				topY,
-				centerX + 220,
-				topY + 70,
-				FILLED,
-				15,
-				15
-			);
+			pWind->DrawRectangle(centerX - 220,topY,centerX + 220,topY + 70,FILLED,15,15);
 
 			pWind->SetFont(28, BOLD, BY_NAME, "Arial");
 
@@ -395,6 +421,7 @@ void Game::changeweather()
 	std::uniform_int_distribution<int> dist(0, 2);
 
 	int r = dist(gen);
+	weathertype oldweather = currentweather;
 	currentweather = (weathertype)r;
 
 	if (currentweather == sunny)
@@ -461,6 +488,14 @@ void Game::changeweather()
 			config.windWidth,
 			config.windHeight - config.statusBarHeight - 2 * config.toolBarHeight,
 			"images\\Desert.jpg");
+	}
+	if (oldweather == deserted && currentweather != deserted) {
+		// Desertification has ended!
+		if (!survivedDesertification) {
+			survivedDesertification = true;
+			// You could also show a message here
+			printMessage("You survived the desertification!");
+		}
 	}
 	showWeatherMessage = true;
 	weatherMessageTimer->setDuration(4000);
@@ -726,8 +761,15 @@ void Game::saving() const{
 	}
 	SaveFile << "WEATHER " << (int)currentweather << " "
 		<< weathertimer->remainingInSeconds() << "\n";
+	SaveFile << "SCORE " << score << "\n";
+	SaveFile << "ACHIEVEMENTS ";
+	for (int i = 0; i < 10; i++) {
+		SaveFile << achievements[i].unlocked << " ";
+	}
+	SaveFile << "\n";
 	SaveFile.close();
 	printMessage("Game Saved!");
+
 }
 
 void Game::startLoading() {
@@ -738,7 +780,71 @@ void Game::startLoading() {
 void Game::restart() {
 	timeToRestart = true;
 }
+void Game::unlockAchievement(int index) {
+	achievements[index].unlocked = true;
+	score += achievements[index].reward;
+	achievementNotification.message = "ACHIEVEMENT: " + achievements[index].name + " +" + to_string(achievements[index].reward);
+	achievementNotification.active = true;
+	achievementNotification.timer->setDuration(3000); 
+	}
+void Game::wolf_removed() {
+	wolf_isremoved = true;
+}
+void Game::checkacheivement()
+{
+	if (!achievements[0].unlocked && totalcreatedeggs >= 1)
+		unlockAchievement(0);
 
+	if (!achievements[1].unlocked && totalcreatedmilk >= 2)
+		unlockAchievement(1);
+
+	if (!achievements[2].unlocked && budget >= 10000)
+		unlockAchievement(2);
+
+	if (!achievements[3].unlocked && BudgetbarIcon::getAnimalCounter() >= 10)
+		unlockAchievement(3);
+
+	if (!achievements[4].unlocked && wolf_isremoved)
+		unlockAchievement(4);
+
+	if (!achievements[5].unlocked && totalcreatedeggs >= 15)
+		unlockAchievement(5);
+
+	if (!achievements[6].unlocked && totalcreatedmilk >= 15)
+		unlockAchievement(6);
+
+	if (!achievements[7].unlocked && level >= 3)
+		unlockAchievement(7);
+
+	if (!achievements[8].unlocked && WaterIcon::waterAmount() >= 10)
+		unlockAchievement(8);
+
+	if (!achievements[9].unlocked && survivedDesertification)
+		unlockAchievement(9);
+}
+void Game::drawAchievementPopup()
+{
+	if (!achievementNotification.active) return;
+
+	if (achievementNotification.timer->remaining()<=0) {
+		achievementNotification.active = false;
+		return;
+	}
+
+	int centerX = config.windWidth / 2;
+	int topY =100;
+	int boxWidth = 450;
+	int boxHeight = 50;
+	int left = centerX - boxWidth / 2;
+
+	pWind->SetPen(GREEN, 2);
+	pWind->SetBrush(DARKGRAY);
+	pWind->DrawRectangle(left, topY, left + boxWidth, topY + boxHeight, FILLED, 8, 8);
+
+	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+	pWind->SetPen(WHITE, 1);
+	pWind->DrawString(left + 10, topY + 15, achievementNotification.message);
+}
 bool Game::go()
 {
 	
@@ -761,22 +867,28 @@ bool Game::go()
 		if (!isPaused && !gameEnded && gameTimer->remaining() > 0) {
 			render();
 			lvlUp();
+			checkacheivement();
+			drawAchievementPopup();
 
-			for (int i = 0; i < 12; i++) {
+			for (int i = 0; i < currentWolves; i++) {
 				if (gameWolves[i]) {
-					for (int j = 0; j < 15; j++) {
+					for (int j = 0; j < ChickIcon::count; j++) {
 						if (ChickIcon::chickList[j] && ChickIcon::chickList[j]->preyed(gameWolves[i])) {
 							delete ChickIcon::chickList[j];
 							ChickIcon::chickList[j] = nullptr;
-							ChickIcon::count--;
+							for (int k = j; k < --ChickIcon::count; k++) {
+								ChickIcon::chickList[k] = ChickIcon::chickList[k + 1];
+							}
 							cout << "A chick was preyed by the wolf!" << endl;
 						}
 					}
-					for (int j = 0; j < 15; j++) {
+					for (int j = 0; j < CowIcon::count; j++) {
 						if (CowIcon::cowList[j] && CowIcon::cowList[j]->preyed(gameWolves[i])) {
 							delete CowIcon::cowList[j];
 							CowIcon::cowList[j] = nullptr;
-							CowIcon::count--;
+							for (int k = j; k < --CowIcon::count; k++) {
+								CowIcon::cowList[k] = CowIcon::cowList[k + 1];
+							}
 							cout << "A cow was preyed by the wolf!" << endl;
 						}
 					}
@@ -819,7 +931,7 @@ bool Game::go()
 			//if (delay.check()) {
 			string status_message = "Level: " + to_string(level) + ", Timer:" + modifyTimerToStandard()
 				+ ", Goal: " + to_string(Game::getTarget()) + ", Current Animal Count : "
-				+ to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount());
+				+ to_string(BudgetbarIcon::getAnimalCounter()) + ", Water Amount : " + to_string(WaterIcon::waterAmount()) + ", Score: " + to_string(score);
 			printMessage(status_message);
 			string budget_string = "BUDGET = $" + to_string(budget);
 			printBudget(budget_string);
