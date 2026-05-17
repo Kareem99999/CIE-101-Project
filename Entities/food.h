@@ -23,7 +23,6 @@ protected:
 	int amount;
 	static int sellprice;
 	string foodImagePath;
-	bool enableDrawing = true;
 public:
 
 	Durations* appearingTimer;
@@ -35,6 +34,7 @@ public:
 };
 
 class eggs : public food {
+	enableDrawing = true;
 public:
 	eggs(Game* r_pGame, point r_point, int r_width, int r_height);
 	void draw() const override;
@@ -46,6 +46,7 @@ public:
 	static int getsellPrice();
 };
 class milk : public food {
+	enableDrawing = true;
 public:
 	//Timer* appearingTimer;
 	milk(Game* r_pGame, point r_point, int r_width, int r_height);
