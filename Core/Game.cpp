@@ -222,6 +222,7 @@ Game::~Game()
 	totalcreatedmilk = 0;
 	delete weathertimer;
 	delete weatherMessageTimer;
+	WolfNextTimeStamp = 300 - 20;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
