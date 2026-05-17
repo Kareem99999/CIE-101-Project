@@ -34,7 +34,7 @@ public:
 };
 
 class eggs : public food {
-	enableDrawing = true;
+	bool enableDrawing = true;
 public:
 	eggs(Game* r_pGame, point r_point, int r_width, int r_height);
 	void draw() const override;
@@ -46,7 +46,7 @@ public:
 	static int getsellPrice();
 };
 class milk : public food {
-	enableDrawing = true;
+	bool enableDrawing = true;
 public:
 	//Timer* appearingTimer;
 	milk(Game* r_pGame, point r_point, int r_width, int r_height);
