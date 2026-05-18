@@ -64,20 +64,21 @@ private:
 	int totalcreatedwolves = 0;
 	int currentWolves = 0;
 	bool survivedDesertification = false;
-
+	int initialTimerDuration = 300; // 5 minutes in milliseconds
 	weathertype currentweather;
 	Timer* weathertimer;
 	Timer* weatherMessageTimer;
 	bool showWeatherMessage = false;
+	string username = "MainUser";
 
 public:
 	Timer* gameTimer;
 	Timer* wolf_delay;
-	int budget = 500;
+	int budget = 0;
 	int timeBonusScore = 0;
 	int score_level_addition = 300;
 	int static WolfNextTimeStamp;
-	int targetBudget = budget + 500;
+	int targetBudget = 0;
 	bool isPaused;
 	bool gameEnded;
 	bool timeToRestart = false;

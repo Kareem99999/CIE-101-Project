@@ -10,7 +10,7 @@ using namespace std;
 
 bool Game::shouldLoad = false;
 bool loadedWeather = false;
-int Game::WolfNextTimeStamp = 300 - 20;
+int Game::WolfNextTimeStamp = 0;
 int Game::level = 1;
 
 // #####################++++++++-------Timer implementations-------++++++++#####################
@@ -79,19 +79,13 @@ void Game::lvlUp() {
 		score += timeBonusScore;
 		string bonusMessage = "Time Bonus: +" + to_string(timeBonusScore) + " Score!";
 		printMessage(bonusMessage);
-		if (budget >= 1000) {
-			targetBudget += 1000;
+		ofstream ScoreFile("ScoreFile.txt", ios::app);
+		if (ScoreFile) {
+			ScoreFile << username << " Level: " << level - 1 << " Score: " << score << endl;
+			ScoreFile.close();
 		}
-		else if (budget >= 10000) {
-			targetBudget += 2000;
-		}
-		else if (budget >= 50000) {
-			targetBudget += 5000;
-		}
-		else {
-			targetBudget += 10000;
-		}
-		budget += 500;
+		
+		restart();
 	}
 }
 
@@ -133,6 +127,7 @@ Game::Game()
 	gameEggslist = new eggs * [100];
 	gameMilklist = new milk * [100];
 	gameWolves = new Wolf * [12];
+	WolfNextTimeStamp = initialTimerDuration - 20; // First wolf appears after 20 seconds
 	for (int i = 0; i < 100; i++) {
 		gameEggslist[i] = nullptr;
 		gameMilklist[i] = nullptr;
@@ -143,6 +138,20 @@ Game::Game()
 	}
 	isPaused = false;
 	wolf_delay = new Timer(20 * 1000);
+	budget += (500 * level);
+	targetBudget = budget + 500;
+	if (budget >= 5000) {
+		targetBudget += 1000;
+	}
+	else if (budget >= 20000) {
+		targetBudget += 5000;
+	}
+	else if (budget >= 50000) {
+		targetBudget += 10000;
+	}
+	else {
+		targetBudget += 20000;
+	}
 
 	if (shouldLoad) {
 		shouldLoad = false;
@@ -256,7 +265,7 @@ Game::~Game()
 	delete weatherMessageTimer;
 	delete achievementNotification.timer;
 	achievementNotification.timer = nullptr;
-	WolfNextTimeStamp = 300 - 20;
+	WolfNextTimeStamp = initialTimerDuration - 20;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
@@ -301,7 +310,7 @@ void Game::render()
 			counter++;
 			ChickIcon::chickList[i]->moveStep();
 			ChickIcon::chickList[i]->ifColl();
-			for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+			for (int x = 0; x < 50; x++) {
 				if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
 					delete WaterIcon::FoodAreaList[x];
 					WaterIcon::FoodAreaList[x] = nullptr;
@@ -321,7 +330,7 @@ void Game::render()
 			counter++;
 			CowIcon::cowList[i]->ifColl();
 			CowIcon::cowList[i]->moveStep();
-			for (int x = 0; x < WaterIcon::waterAmount(); x++) {
+			for (int x = 0; x < 50; x++) {
 				if (WaterIcon::FoodAreaList[x] && WaterIcon::FoodAreaList[x]->getfoodcounter() <= 0) {
 					delete WaterIcon::FoodAreaList[x];
 					WaterIcon::FoodAreaList[x] = nullptr;
@@ -336,7 +345,7 @@ void Game::render()
 		if (counter >= CowIcon::count) { break; }
 	}
 	counter = 0;
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 12; i++) {
 		if (gameWolves[i]) {
 			gameWolves[i]->moveStep();
 		}
@@ -471,11 +480,14 @@ void Game::changeweather()
 			p.y = dist2(gen2);
 			if (WaterIcon::waterAmount() < 50)
 			{
-				WaterIcon::FoodAreaList[WaterIcon::waterAmount()] = new FoodArea(this, p);
-
-				WaterIcon::FoodAreaList[WaterIcon::waterAmount()]->draw();
-
-				WaterIcon::increasewater();
+				for (int i = 0; i < 50; i++) {
+					if (!WaterIcon::FoodAreaList[i]) {
+						WaterIcon::FoodAreaList[i] = new FoodArea(this, p);
+						WaterIcon::FoodAreaList[i]->draw();
+						WaterIcon::amount++;
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -605,7 +617,7 @@ void Game::createWolf()
 	gameWolves[totalcreatedwolves]->draw();
 	totalcreatedwolves++;
 	currentWolves++;
-	WolfNextTimeStamp -= ((300 - 20) / (level+1));
+	WolfNextTimeStamp -= ((initialTimerDuration - 20) / (level+1));
 }
 
 void Game::createWarehouse(){
@@ -636,7 +648,7 @@ Budgetbar* Game::getBudgetbar() const
 
 void Game::createTimer()
 {
-	gameTimer = new Timer(300 * 1000);
+	gameTimer = new Timer(initialTimerDuration * 1000);
 }
 
 string Game::modifyTimerToStandard() const
@@ -734,13 +746,13 @@ void Game::saving() const{
 	for (int i = 0; i < BUDGET_ICON_COUNT; i++) {
 		gameBudgetbar->getIcon(i)->Saving(SaveFile);
 	}
-	SaveFile << "WOLVES " << currentWolves << " " << WolfNextTimeStamp << "\n";
+	SaveFile << "\nWOLVES " << currentWolves << " " << WolfNextTimeStamp << "\n";
 	for (int i = 0; i < totalcreatedwolves; i++) {
 		if(gameWolves[i]){
 			gameWolves[i]->Saving(SaveFile);
 		}
 	}
-	SaveFile << "WAREHOUSE\n";
+	SaveFile << "\nWAREHOUSE\n";
 	SaveFile << "EGGS " << totalcreatedeggs << "\n";
 	int counter = 0;
 	for (int i = 0; i < 100; i++) {
@@ -759,9 +771,9 @@ void Game::saving() const{
 		}
 		if (counter >= totalcreatedmilk) { break; }
 	}
-	SaveFile << "WEATHER " << (int)currentweather << " "
+	SaveFile << "\nWEATHER " << (int)currentweather << " "
 		<< weathertimer->remainingInSeconds() << "\n";
-	SaveFile << "SCORE " << score << "\n";
+	SaveFile << "\nSCORE " << score << "\n";
 	SaveFile << "ACHIEVEMENTS ";
 	for (int i = 0; i < 10; i++) {
 		SaveFile << achievements[i].unlocked << " ";
@@ -850,7 +862,6 @@ bool Game::go()
 	
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
-	int static level = 1;
 	bool isExit = false;
 	gameEnded = false;
 	pWind->ChangeTitle(" Farm Frenzy (CIE101-project)");
@@ -870,25 +881,21 @@ bool Game::go()
 			checkacheivement();
 			drawAchievementPopup();
 
-			for (int i = 0; i < currentWolves; i++) {
+			for (int i = 0; i < 12; i++) {
 				if (gameWolves[i]) {
-					for (int j = 0; j < ChickIcon::count; j++) {
+					for (int j = 0; j < 15; j++) {
 						if (ChickIcon::chickList[j] && ChickIcon::chickList[j]->preyed(gameWolves[i])) {
 							delete ChickIcon::chickList[j];
 							ChickIcon::chickList[j] = nullptr;
-							for (int k = j; k < --ChickIcon::count; k++) {
-								ChickIcon::chickList[k] = ChickIcon::chickList[k + 1];
-							}
+							ChickIcon::changeChickCount(-1);
 							cout << "A chick was preyed by the wolf!" << endl;
 						}
 					}
-					for (int j = 0; j < CowIcon::count; j++) {
+					for (int j = 0; j < 15; j++) {
 						if (CowIcon::cowList[j] && CowIcon::cowList[j]->preyed(gameWolves[i])) {
 							delete CowIcon::cowList[j];
 							CowIcon::cowList[j] = nullptr;
-							for (int k = j; k < --CowIcon::count; k++) {
-								CowIcon::cowList[k] = CowIcon::cowList[k + 1];
-							}
+							CowIcon::changeCowCount(-1);
 							cout << "A cow was preyed by the wolf!" << endl;
 						}
 					}

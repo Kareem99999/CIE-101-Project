@@ -443,8 +443,8 @@ void WaterIcon::onClick()
 			p.y = dist2(gen2);
 			for (int i = 0; i < 50; i++) {
 				if (!FoodAreaList[i]) {
-					FoodAreaList[amount] = new FoodArea(pGame, p);
-					FoodAreaList[amount]->draw();
+					FoodAreaList[i] = new FoodArea(pGame, p);
+					FoodAreaList[i]->draw();
 					amount++;
 					break;
 				}

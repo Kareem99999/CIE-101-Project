@@ -91,6 +91,12 @@ void Warehouse::draw() const
 {
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, WarehouseWidth, WarehouseHeight);
+	pWind->DrawImage("images\\EGG.jpeg", RefPoint.x + 0.40 * WarehouseWidth, RefPoint.y + 0.4 * WarehouseHeight, 25, 25);
+	pWind->DrawImage("images\\MILK.jpg", RefPoint.x + 0.40 * WarehouseWidth, RefPoint.y + 0.65 * WarehouseHeight, 25, 25);
+	pWind->SetFont(18, BOLD, BY_NAME, "Arial");
+	pWind->SetPen(WHITE, 1);
+	pWind->DrawString(RefPoint.x + 0.5 * WarehouseWidth, RefPoint.y + 0.4 * WarehouseHeight, ":" + to_string(pGame->getEggcount()));
+	pWind->DrawString(RefPoint.x + 0.5 * WarehouseWidth, RefPoint.y + 0.65 * WarehouseHeight, ":" + to_string(pGame->getMilkcount()));
 };
 
 int Warehouse::getWarehouseWidth() { return WarehouseWidth; }
