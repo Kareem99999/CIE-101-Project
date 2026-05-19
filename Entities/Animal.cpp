@@ -22,7 +22,6 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 
 void Animal::draw() const
 {
-	//draw image of this object
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	int remaining = getremainingfood();
@@ -32,17 +31,14 @@ void Animal::draw() const
 		int boxX = RefPoint.x + (width / 2) - (boxWidth / 2);
 		int boxY = RefPoint.y - boxHeight - 3;
 
-		// Draw box background
 		pWind->SetPen(BLACK, 1);
 		pWind->SetBrush(LIGHTGRAY);
 		pWind->DrawRectangle(boxX, boxY, boxX + boxWidth, boxY + boxHeight, FILLED);
 
-		// Draw border
 		pWind->SetPen(BLACK, 1);
 		pWind->SetBrush(TRANSPARENT);
 		pWind->DrawRectangle(boxX, boxY, boxX + boxWidth, boxY + boxHeight, FRAME);
 
-		// Draw the number
 		pWind->SetFont(14, BOLD, BY_NAME, "Arial");
 		pWind->SetPen(BLACK, 1);
 		pWind->DrawString(boxX + 8, boxY + 3, to_string(remaining));
@@ -211,6 +207,7 @@ void Cow::moveStep()
 	curr_pos.x += curr_vel.x;
 	curr_pos.y += curr_vel.y;
 	RefPoint = curr_pos;
+	pGame->getFarm()->keepInFarm(curr_pos, curr_vel, { cowDimensions.x, cowDimensions.y }, 4, 3);
 	draw();
 
 }
